@@ -1,0 +1,15 @@
+# Normalize line endings across platforms
+* text=auto eol=lf
+
+# Large binary model file — treat as binary, don't diff
+apps/web/public/models/*.onnx binary
+
+# Images — binary, no diffing
+*.png binary
+*.jpg binary
+*.jpeg binary
+
+# Exclude vendored/generated content from GitHub's language stats
+apps/web/public/** linguist-vendored
+ml/notebooks/*.ipynb linguist-generated
+apps/web/package-lock.json linguist-generated
