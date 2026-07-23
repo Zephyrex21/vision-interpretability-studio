@@ -1,0 +1,27 @@
+# Node / web app
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Python / ML
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+venv/
+.venv/
+*.egg-info/
+
+# ML artifacts (large files stay out of git; document how to regenerate instead)
+ml/checkpoints/
+ml/data/
+*.pt
+*.pth
+*.onnx.tmp
+
+# OS / editor
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.log

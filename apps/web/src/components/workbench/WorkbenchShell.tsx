@@ -1,0 +1,79 @@
+import { motion } from 'framer-motion';
+import { useWorkbench } from '../../state/WorkbenchContext';
+import type { VisualizationTab } from '../../state/WorkbenchContext';
+import { ThemeToggle } from '../ui/ThemeToggle';
+import { GradCamView } from '../visualizations/GradCamView';
+import { FeatureVizView } from '../visualizations/FeatureVizView';
+import styles from './WorkbenchShell.module.css';
+
+const TABS: { id: VisualizationTab; label: string; caption: string; status: 'live' | 'soon' }[] = [
+  { id: 'gradcam', label: 'Grad-CAM', caption: 'What drove the decision', status: 'live' },
+  { id: 'features', label: 'Features', caption: 'What each filter detects', status: 'live' },
+  { id: 'adversarial', label: 'Adversarial', caption: 'How fragile is trust', status: 'soon' },
+  { id: 'compare', label: 'Compare', caption: 'Side-by-side attention', status: 'soon' },
+];
+
+export function WorkbenchShell() {
+  const { activeTab, setActiveTab } = useWorkbench();
+  const active = TABS.find((t) => t.id === activeTab)!;
+
+  return (
+    <div className={styles.shell}>
+      <header className={styles.header}>
+        <div>
+          <p className={styles.eyebrow}>Vision Interpretability Studio</p>
+          <h1 className={styles.title}>See inside the model, not just its answer</h1>
+        </div>
+        <ThemeToggle />
+      </header>
+
+      <nav className={styles.tabs} aria-label="Visualization mode">
+        {TABS.map((tab) => {
+          const isActive = tab.id === activeTab;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              className={styles.tabButton}
+              aria-pressed={isActive}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {isActive && (
+                <motion.span
+                  layoutId="tab-highlight"
+                  className={styles.tabHighlight}
+                  transition={{ type: 'spring', stiffness: 500, damping: 40 }}
+                />
+              )}
+              <span className={styles.tabContent}>
+                <span className={styles.tabLabel}>{tab.label}</span>
+                {tab.status === 'soon' && <span className={styles.soonBadge}>soon</span>}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
+
+      <main className={`${styles.stage} glass-panel`}>
+        <motion.div
+          key={active.id}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+        >
+          <p className={styles.stageCaption}>{active.caption}</p>
+
+          {active.id === 'gradcam' && <GradCamView />}
+          {active.id === 'features' && <FeatureVizView />}
+          {(active.id === 'adversarial' || active.id === 'compare') && (
+            <div className={styles.stagePlaceholder}>
+              {active.label} lands in Phase 2.5 — it needs real backpropagation, which plain
+              in-browser inference doesn't support. Coming next with a proper solution rather than a
+              faked one.
+            </div>
+          )}
+        </motion.div>
+      </main>
+    </div>
+  );
+}

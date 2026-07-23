@@ -1,0 +1,121 @@
+/**
+ * Design tokens — Vision Interpretability Studio
+ *
+ * Palette rationale (Phase 0):
+ * - Accent stays violet across both themes for brand consistency with the
+ *   rest of the portfolio (AllowOrigin, Lumora, etc).
+ * - Heatmap tokens use a cool-violet -> warm-amber diverging scale instead
+ *   of a classic red/green "jet" colormap: it's colorblind-safer, it stays
+ *   legible sitting on top of either theme's background, and it reads as
+ *   "ours" rather than a generic scientific-plot default.
+ * - Glass surfaces use very low-alpha whites/blacks so the same component
+ *   markup works in both themes without conditional styling.
+ */
+
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* Surfaces */
+  --surface-canvas: #0b0b10;
+  --surface-panel: rgba(255, 255, 255, 0.04);
+  --surface-panel-border: rgba(255, 255, 255, 0.08);
+  --surface-raised: rgba(255, 255, 255, 0.07);
+
+  /* Text */
+  --text-primary: #f4f3f8;
+  --text-secondary: #c7c6d1;
+  --text-muted: #9a9aa8;
+
+  /* Accent */
+  --accent: #8b7cff;
+  --accent-strong: #a597ff;
+  --accent-contrast: #0b0b10;
+
+  /* Heatmap scale (cool -> warm) */
+  --heat-low: #2a2470;
+  --heat-mid: #8b3fbf;
+  --heat-high: #ffb454;
+
+  /* Semantic */
+  --success: #4ade80;
+  --danger: #ff6b6b;
+  --warning: #ffb454;
+
+  /* Elevation / effects */
+  --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.35);
+  --blur-glass: 16px;
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+
+  --surface-canvas: #fafafc;
+  --surface-panel: rgba(20, 21, 26, 0.03);
+  --surface-panel-border: rgba(20, 21, 26, 0.08);
+  --surface-raised: rgba(20, 21, 26, 0.05);
+
+  --text-primary: #14151a;
+  --text-secondary: #3a3b44;
+  --text-muted: #5b5f6b;
+
+  --accent: #6c5cff;
+  --accent-strong: #5544e6;
+  --accent-contrast: #ffffff;
+
+  --heat-low: #4b3fbf;
+  --heat-mid: #8b3fbf;
+  --heat-high: #e08a2e;
+
+  --success: #16a34a;
+  --danger: #dc2626;
+  --warning: #d97706;
+
+  --shadow-soft: 0 8px 30px rgba(20, 21, 26, 0.08);
+  --blur-glass: 16px;
+}
+
+:root {
+  /* Type scale */
+  --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-base: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.5rem;
+  --fs-2xl: 2rem;
+  --fs-3xl: 2.75rem;
+
+  /* Spacing scale (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+
+  /* Motion */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

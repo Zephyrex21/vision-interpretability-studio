@@ -1,0 +1,123 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.intro {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+  max-width: 62ch;
+}
+
+.layerGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.layerHeader {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.layerTitle {
+  margin: 0;
+  font-size: var(--fs-base);
+  color: var(--accent-strong);
+  text-transform: capitalize;
+}
+
+.layerCaption {
+  margin: 0;
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: var(--space-3);
+}
+
+.thumb {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--surface-panel-border);
+  padding: 0;
+  cursor: pointer;
+  background: none;
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.thumb:hover {
+  border-color: var(--accent);
+}
+
+.thumbLabel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--space-1);
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  text-align: center;
+}
+
+.lightboxBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: var(--space-5);
+}
+
+.lightboxCard {
+  background: var(--surface-canvas);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  max-width: min(90vw, 480px);
+  border: 1px solid var(--surface-panel-border);
+}
+
+.lightboxImage {
+  width: 100%;
+  display: block;
+}
+
+.lightboxMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--text-primary);
+  text-transform: capitalize;
+}
+
+.lightboxMeta button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: var(--fs-lg);
+  cursor: pointer;
+  line-height: 1;
+}

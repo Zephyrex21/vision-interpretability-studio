@@ -1,0 +1,62 @@
+[
+  {
+    "layer": "layer1",
+    "filter_index": 0,
+    "file": "layer1_filter0.png"
+  },
+  {
+    "layer": "layer1",
+    "filter_index": 8,
+    "file": "layer1_filter8.png"
+  },
+  {
+    "layer": "layer1",
+    "filter_index": 16,
+    "file": "layer1_filter16.png"
+  },
+  {
+    "layer": "layer2",
+    "filter_index": 0,
+    "file": "layer2_filter0.png"
+  },
+  {
+    "layer": "layer2",
+    "filter_index": 16,
+    "file": "layer2_filter16.png"
+  },
+  {
+    "layer": "layer2",
+    "filter_index": 32,
+    "file": "layer2_filter32.png"
+  },
+  {
+    "layer": "layer3",
+    "filter_index": 0,
+    "file": "layer3_filter0.png"
+  },
+  {
+    "layer": "layer3",
+    "filter_index": 32,
+    "file": "layer3_filter32.png"
+  },
+  {
+    "layer": "layer3",
+    "filter_index": 64,
+    "file": "layer3_filter64.png"
+  },
+  {
+    "layer": "layer4",
+    "filter_index": 0,
+    "file": "layer4_filter0.png"
+  },
+  {
+    "layer": "layer4",
+    "filter_index": 64,
+    "file": "layer4_filter64.png"
+  },
+  {
+    "layer": "layer4",
+    "filter_index": 128,
+    "file": "layer4_filter128.png"
+  }
+]

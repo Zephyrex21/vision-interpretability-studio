@@ -1,0 +1,160 @@
+.shell {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5) var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.eyebrow {
+  margin: 0 0 var(--space-1);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+
+.title {
+  font-size: var(--fs-2xl);
+  max-width: 34ch;
+  color: var(--text-primary);
+}
+
+.imagePanel {
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.imagePlaceholder {
+  height: 180px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--surface-panel-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+}
+
+.predictionRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+}
+
+.predictionLabel {
+  color: var(--text-muted);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.predictionValue {
+  color: var(--text-primary);
+  font-size: var(--fs-base);
+}
+
+.tabs {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.tabButton {
+  position: relative;
+  background: transparent;
+  border: 1px solid var(--surface-panel-border);
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.tabButton[aria-pressed='true'] {
+  color: var(--accent-contrast);
+}
+
+.tabHighlight {
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  z-index: 0;
+}
+
+.tabContent {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.tabLabel {
+  position: relative;
+}
+
+.soonBadge {
+  position: relative;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--surface-raised);
+  color: var(--text-muted);
+}
+
+.tabButton[aria-pressed='true'] .soonBadge {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--accent-contrast);
+}
+
+.stage {
+  padding: var(--space-6);
+  min-height: 260px;
+}
+
+.stageCaption {
+  margin: 0 0 var(--space-4);
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+}
+
+.stagePlaceholder {
+  border: 1px dashed var(--surface-panel-border);
+  border-radius: var(--radius-sm);
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  text-align: center;
+  padding: var(--space-4);
+}
+
+@media (max-width: 640px) {
+  .header {
+    flex-direction: column;
+  }
+
+  .title {
+    font-size: var(--fs-xl);
+  }
+}
