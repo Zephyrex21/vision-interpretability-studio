@@ -4,13 +4,20 @@ import type { VisualizationTab } from '../../state/WorkbenchContext';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { GradCamView } from '../visualizations/GradCamView';
 import { FeatureVizView } from '../visualizations/FeatureVizView';
+import { AdversarialView } from '../visualizations/AdversarialView';
+import { CompareView } from '../visualizations/CompareView';
 import styles from './WorkbenchShell.module.css';
 
 const TABS: { id: VisualizationTab; label: string; caption: string; status: 'live' | 'soon' }[] = [
   { id: 'gradcam', label: 'Grad-CAM', caption: 'What drove the decision', status: 'live' },
   { id: 'features', label: 'Features', caption: 'What each filter detects', status: 'live' },
-  { id: 'adversarial', label: 'Adversarial', caption: 'How fragile is trust', status: 'soon' },
-  { id: 'compare', label: 'Compare', caption: 'Side-by-side attention', status: 'soon' },
+  { id: 'adversarial', label: 'Adversarial', caption: 'How fragile is trust', status: 'live' },
+  {
+    id: 'compare',
+    label: 'Compare',
+    caption: 'Live Grad-CAM vs precomputed Grad-CAM++',
+    status: 'live',
+  },
 ];
 
 export function WorkbenchShell() {
@@ -65,13 +72,8 @@ export function WorkbenchShell() {
 
           {active.id === 'gradcam' && <GradCamView />}
           {active.id === 'features' && <FeatureVizView />}
-          {(active.id === 'adversarial' || active.id === 'compare') && (
-            <div className={styles.stagePlaceholder}>
-              {active.label} lands in Phase 2.5 — it needs real backpropagation, which plain
-              in-browser inference doesn't support. Coming next with a proper solution rather than a
-              faked one.
-            </div>
-          )}
+          {active.id === 'adversarial' && <AdversarialView />}
+          {active.id === 'compare' && <CompareView />}
         </motion.div>
       </main>
     </div>

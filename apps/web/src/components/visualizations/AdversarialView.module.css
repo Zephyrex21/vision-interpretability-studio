@@ -1,0 +1,136 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.intro {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+  max-width: 68ch;
+  line-height: 1.6;
+}
+
+.intro strong {
+  color: var(--text-primary);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-4);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sliderWrapper {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--surface-panel-border);
+  cursor: ew-resize;
+  user-select: none;
+}
+
+.baseImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.overlayClip {
+  position: absolute;
+  inset: 0;
+}
+
+.sliderHandle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--accent);
+  transform: translateX(-1px);
+  pointer-events: none;
+}
+
+.sliderHandle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+}
+
+.sideLabel {
+  position: absolute;
+  bottom: 8px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 2px 6px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.predictionRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  flex-wrap: wrap;
+}
+
+.predictionOk {
+  color: var(--text-secondary);
+  text-transform: capitalize;
+}
+
+.predictionMuted {
+  color: var(--text-muted);
+  text-transform: capitalize;
+}
+
+.predictionFlipped {
+  color: var(--danger);
+  text-transform: capitalize;
+  font-weight: 600;
+}
+
+.arrow {
+  color: var(--text-muted);
+}
+
+.flippedBadge {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  border-radius: 999px;
+  padding: 1px 6px;
+  white-space: nowrap;
+}

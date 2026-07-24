@@ -28,12 +28,9 @@ describe('WorkbenchShell', () => {
     }
   });
 
-  it('marks the not-yet-implemented tabs as "soon"', () => {
+  it('does not show any "soon" badges — all four tabs are live', () => {
     renderShell();
-    const adversarialTab = screen.getByRole('button', { name: /Adversarial/ });
-    const compareTab = screen.getByRole('button', { name: /Compare/ });
-    expect(adversarialTab).toHaveTextContent(/soon/i);
-    expect(compareTab).toHaveTextContent(/soon/i);
+    expect(screen.queryByText(/soon/i)).not.toBeInTheDocument();
   });
 
   it('switches the active tab caption when a different tab is clicked', async () => {
@@ -43,10 +40,19 @@ describe('WorkbenchShell', () => {
     expect(await screen.findByText(/what each filter detects/i)).toBeInTheDocument();
   });
 
-  it('shows the Phase 2.5 explanation for the adversarial tab', async () => {
+  it('shows the adversarial comparison gallery on the adversarial tab', async () => {
     const user = userEvent.setup();
     renderShell();
     await user.click(screen.getByRole('button', { name: /^Adversarial/ }));
-    expect(await screen.findByText(/real backpropagation/i)).toBeInTheDocument();
+    expect(await screen.findByText(/fast gradient sign method/i)).toBeInTheDocument();
+  });
+
+  it('shows the live-vs-precomputed explanation on the compare tab', async () => {
+    const user = userEvent.setup();
+    renderShell();
+    await user.click(screen.getByRole('button', { name: /^Compare/ }));
+    expect(
+      await screen.findByText(/computed fresh, right now, in your browser/i),
+    ).toBeInTheDocument();
   });
 });

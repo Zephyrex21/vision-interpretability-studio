@@ -6,12 +6,12 @@ adversarial perturbation and Grad-CAM++ comparisons coming next. Inference
 runs entirely client-side via ONNX Runtime Web; there is no backend and no
 paid service anywhere in the stack.
 
-> **Status: Phase 2 — Inference Engine, done.** The workbench is live: pick
-> a sample or upload any image and get a real prediction plus an exact
-> Grad-CAM heatmap, computed by your trained ResNet-18 running in the
-> browser. The Features tab browses the precomputed filter-visualization
-> gallery. Adversarial and Compare are next (see "What's next" below for why
-> they aren't live yet).
+> **Status: Phase 2.5 — all four tabs live.** Grad-CAM (live, exact, any
+> image), Features (browsable filter gallery), Adversarial (precomputed
+> FGSM comparison gallery — 4/10 sample predictions flip at ε=0.03, several
+> with 90%+ confidence in the wrong answer), and Compare (live Grad-CAM
+> computed fresh in your browser, shown next to precomputed Grad-CAM++ for
+> the same image) all work today.
 
 ---
 
@@ -27,12 +27,13 @@ vision-interpretability-studio/
 │       └── src/
 │           ├── components/
 │           │   ├── workbench/       # layout shell, tab navigation
-│           │   ├── visualizations/  # GradCamView, FeatureVizView (live); adversarial/compare (soon)
+│           │   ├── visualizations/  # GradCamView, FeatureVizView, AdversarialView, CompareView
 │           │   └── ui/              # shared primitives (ThemeToggle, etc.)
 │           ├── lib/
 │           │   ├── onnx/            # session setup, preprocessing, classify + exact Grad-CAM
 │           │   └── gradcam/         # canvas heatmap rendering (bilinear upsample + color scale)
-│           ├── data/                # bundled JSON: class labels, FC weights, sample/feature-viz metadata
+│           ├── data/                # bundled JSON: class labels, FC weights, sample/feature-viz/
+│           │                        # adversarial/Grad-CAM++ metadata
 │           ├── state/                # ThemeContext, WorkbenchContext
 │           ├── styles/               # design tokens (tokens.css), global.css
 │           └── test/                 # Vitest setup
@@ -125,10 +126,11 @@ npm run build
 > the way `&&` does.
 
 Expected result: all steps exit `0`. The test suite covers three areas —
-**15 tests total**:
+**16 tests total**:
 
-- `WorkbenchShell.test.tsx` (5) — all four tabs render, "soon" badges show on
-  the not-yet-live tabs, clicking a tab switches its content
+- `WorkbenchShell.test.tsx` (6) — all four tabs render, no "soon" badges
+  remain, clicking a tab switches its content, the Adversarial and Compare
+  tabs render their real intro copy
 - `lib/onnx/inference.test.ts` (6) — softmax is numerically stable and sums
   to 1; the Grad-CAM math stays normalized to `[0, 1]`, never produces NaN,
   and safely handles all-zero activations without dividing by zero
@@ -160,22 +162,32 @@ math tests (numpy-only, no GPU) on Python 3.11, on every push and PR to
   trains a ResNet-18 from scratch on Imagenette (88.2% val accuracy),
   implements Grad-CAM/Grad-CAM++/feature-viz/FGSM in PyTorch, and exports to
   ONNX with a verified parity check. Runs on Kaggle's free GPU tier.
-- **Phase 2 — Inference Engine (this phase):** ONNX Runtime Web wired into
-  the workbench; live classifier + exact Grad-CAM for any image; Features
-  tab browsing the precomputed filter gallery.
+- **Phase 2 — Inference Engine:** ONNX Runtime Web wired into the
+  workbench; live classifier + exact Grad-CAM for any image; Features tab
+  browsing the precomputed filter gallery.
+- **Phase 2.5 — Adversarial & Compare:** `ml/src/prepare_gradcam_export.py`'s
+  sibling notebook cells (section 10) export per-sample Grad-CAM++ overlays
+  and FGSM adversarial triples for the 10 bundled images — genuine results
+  requiring real backpropagation, computed once on Kaggle and shipped as a
+  static comparison gallery. The Adversarial tab shows a clean/adversarial
+  slider per image (4/10 predictions flip at ε=0.03, several with 90%+
+  confidence in the wrong class); the Compare tab runs live Grad-CAM in the
+  browser right next to the precomputed Grad-CAM++ result for the same
+  image, so you can see the two methods agree.
 
 ## What's next
 
-**Adversarial (FGSM) and Compare/Grad-CAM++** both genuinely need gradients
-w.r.t. the input or higher-order gradient terms that don't reduce to a
-closed form the way standard Grad-CAM does — plain ONNX Runtime Web can't
-compute either. Rather than fake them, their tabs are marked "soon" in the
-UI. The honest path forward is one of:
+Everything planned for the interpretability tool itself now works. Natural
+directions from here:
 
-1. Ship the FGSM/Grad-CAM++ results already generated in the Phase 1
-   notebook as a precomputed comparison gallery (fast — just needs 2 more
-   files exported from Kaggle), interactive only for the 10 bundled sample
-   images rather than arbitrary uploads.
-2. A proper backprop-capable in-browser runtime (e.g. re-hosting the
-   trained weights in TensorFlow.js, which does support autograd) for true
-   per-upload interactivity — a bigger lift, tracked as a stretch goal.
+1. **Per-upload adversarial/Grad-CAM++** — true interactivity for *any*
+   uploaded image (not just the 10 bundled samples) needs a backprop-capable
+   in-browser runtime, e.g. re-hosting the trained weights in TensorFlow.js.
+   Bigger lift, tracked as a stretch goal.
+2. **Model card / case-study write-up** — a short page documenting what was
+   learned (e.g. how confidently the model can be fooled at a barely-visible
+   ε=0.03) makes a stronger portfolio narrative than the tool alone.
+3. **Performance** — the WASM runtime is single-threaded by design (see
+   `lib/onnx/session.ts` for why); code-splitting the ~500KB JS bundle and
+   lazy-loading `onnxruntime-web` only when the Grad-CAM tab is opened would
+   improve first paint.

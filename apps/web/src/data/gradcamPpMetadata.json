@@ -1,0 +1,82 @@
+[
+  {
+    "sample_index": 0,
+    "true_label": "chain saw",
+    "predicted_label": "chain saw",
+    "confidence": 0.9156,
+    "correct": true,
+    "file": "gradcam_pp_00_chain_saw.png"
+  },
+  {
+    "sample_index": 1,
+    "true_label": "parachute",
+    "predicted_label": "parachute",
+    "confidence": 1.0,
+    "correct": true,
+    "file": "gradcam_pp_01_parachute.png"
+  },
+  {
+    "sample_index": 2,
+    "true_label": "English springer",
+    "predicted_label": "English springer",
+    "confidence": 0.9883,
+    "correct": true,
+    "file": "gradcam_pp_02_English_springer.png"
+  },
+  {
+    "sample_index": 3,
+    "true_label": "church",
+    "predicted_label": "church",
+    "confidence": 1.0,
+    "correct": true,
+    "file": "gradcam_pp_03_church.png"
+  },
+  {
+    "sample_index": 4,
+    "true_label": "garbage truck",
+    "predicted_label": "garbage truck",
+    "confidence": 1.0,
+    "correct": true,
+    "file": "gradcam_pp_04_garbage_truck.png"
+  },
+  {
+    "sample_index": 5,
+    "true_label": "tench",
+    "predicted_label": "tench",
+    "confidence": 1.0,
+    "correct": true,
+    "file": "gradcam_pp_05_tench.png"
+  },
+  {
+    "sample_index": 6,
+    "true_label": "tench",
+    "predicted_label": "tench",
+    "confidence": 1.0,
+    "correct": true,
+    "file": "gradcam_pp_06_tench.png"
+  },
+  {
+    "sample_index": 7,
+    "true_label": "golf ball",
+    "predicted_label": "golf ball",
+    "confidence": 1.0,
+    "correct": true,
+    "file": "gradcam_pp_07_golf_ball.png"
+  },
+  {
+    "sample_index": 8,
+    "true_label": "French horn",
+    "predicted_label": "French horn",
+    "confidence": 1.0,
+    "correct": true,
+    "file": "gradcam_pp_08_French_horn.png"
+  },
+  {
+    "sample_index": 9,
+    "true_label": "tench",
+    "predicted_label": "tench",
+    "confidence": 1.0,
+    "correct": true,
+    "file": "gradcam_pp_09_tench.png"
+  }
+]
