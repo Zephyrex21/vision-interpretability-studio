@@ -1,12 +1,26 @@
+import { lazy, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { useWorkbench } from '../../state/WorkbenchContext';
 import type { VisualizationTab } from '../../state/WorkbenchContext';
 import { ThemeToggle } from '../ui/ThemeToggle';
-import { GradCamView } from '../visualizations/GradCamView';
-import { FeatureVizView } from '../visualizations/FeatureVizView';
-import { AdversarialView } from '../visualizations/AdversarialView';
-import { CompareView } from '../visualizations/CompareView';
 import styles from './WorkbenchShell.module.css';
+
+// Lazy-loaded per tab so a visitor who only opens, say, the Features tab
+// never downloads onnxruntime-web's JS wrapper (~500KB) at all — that code
+// only lives in the Grad-CAM and Compare chunks, which are the only two
+// tabs that actually run model inference.
+const GradCamView = lazy(() =>
+  import('../visualizations/GradCamView').then((m) => ({ default: m.GradCamView })),
+);
+const FeatureVizView = lazy(() =>
+  import('../visualizations/FeatureVizView').then((m) => ({ default: m.FeatureVizView })),
+);
+const AdversarialView = lazy(() =>
+  import('../visualizations/AdversarialView').then((m) => ({ default: m.AdversarialView })),
+);
+const CompareView = lazy(() =>
+  import('../visualizations/CompareView').then((m) => ({ default: m.CompareView })),
+);
 
 const TABS: { id: VisualizationTab; label: string; caption: string; status: 'live' | 'soon' }[] = [
   { id: 'gradcam', label: 'Grad-CAM', caption: 'What drove the decision', status: 'live' },
@@ -70,10 +84,12 @@ export function WorkbenchShell() {
         >
           <p className={styles.stageCaption}>{active.caption}</p>
 
-          {active.id === 'gradcam' && <GradCamView />}
-          {active.id === 'features' && <FeatureVizView />}
-          {active.id === 'adversarial' && <AdversarialView />}
-          {active.id === 'compare' && <CompareView />}
+          <Suspense fallback={<div className={styles.tabLoading}>Loading {active.label}…</div>}>
+            {active.id === 'gradcam' && <GradCamView />}
+            {active.id === 'features' && <FeatureVizView />}
+            {active.id === 'adversarial' && <AdversarialView />}
+            {active.id === 'compare' && <CompareView />}
+          </Suspense>
         </motion.div>
       </main>
     </div>

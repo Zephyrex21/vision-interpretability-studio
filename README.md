@@ -154,6 +154,18 @@ math tests (numpy-only, no GPU) on Python 3.11, on every push and PR to
 
 ---
 
+## Performance
+
+Tab content is code-split via `React.lazy` + `Suspense` — each of the four
+visualization views (`GradCamView`, `FeatureVizView`, `AdversarialView`,
+`CompareView`) is its own JS chunk, and the shared `onnxruntime-web` +
+inference code (~174KB) only downloads if you actually open the Grad-CAM or
+Compare tab. A visitor who only browses Features/Adversarial never pays for
+the ONNX runtime at all. The main shell chunk dropped from 513KB to 319KB as
+a result. The 13MB WASM binary itself is fetched separately by
+`onnxruntime-web` only at the moment a model session is actually created —
+it was never part of the JS bundle to begin with.
+
 ## Phases so far
 
 - **Phase 0 — Foundation & Planning:** repo scaffold, design tokens,
@@ -187,7 +199,3 @@ directions from here:
 2. **Model card / case-study write-up** — a short page documenting what was
    learned (e.g. how confidently the model can be fooled at a barely-visible
    ε=0.03) makes a stronger portfolio narrative than the tool alone.
-3. **Performance** — the WASM runtime is single-threaded by design (see
-   `lib/onnx/session.ts` for why); code-splitting the ~500KB JS bundle and
-   lazy-loading `onnxruntime-web` only when the Grad-CAM tab is opened would
-   improve first paint.
