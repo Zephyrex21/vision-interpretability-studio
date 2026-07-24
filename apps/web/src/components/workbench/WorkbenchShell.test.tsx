@@ -21,9 +21,9 @@ describe('WorkbenchShell', () => {
     expect(screen.getByText(/see inside the model/i)).toBeInTheDocument();
   });
 
-  it('renders all four visualization tabs', () => {
+  it('renders all five visualization tabs', () => {
     renderShell();
-    for (const label of ['Grad-CAM', 'Features', 'Adversarial', 'Compare']) {
+    for (const label of ['Grad-CAM', 'Layers', 'Features', 'Adversarial', 'Compare']) {
       expect(screen.getByRole('button', { name: new RegExp(label) })).toBeInTheDocument();
     }
   });
@@ -38,6 +38,13 @@ describe('WorkbenchShell', () => {
     renderShell();
     await user.click(screen.getByRole('button', { name: /^Features/ }));
     expect(await screen.findByText(/what each filter detects/i)).toBeInTheDocument();
+  });
+
+  it('shows the layer-scrubber intro on the Layers tab', async () => {
+    const user = userEvent.setup();
+    renderShell();
+    await user.click(screen.getByRole('button', { name: /^Layers/ }));
+    expect(await screen.findByText(/scrub through network depth/i)).toBeInTheDocument();
   });
 
   it('shows the adversarial comparison gallery on the adversarial tab', async () => {

@@ -6,12 +6,13 @@ adversarial perturbation and Grad-CAM++ comparisons coming next. Inference
 runs entirely client-side via ONNX Runtime Web; there is no backend and no
 paid service anywhere in the stack.
 
-> **Status: Phase 2.5 — all four tabs live.** Grad-CAM (live, exact, any
-> image), Features (browsable filter gallery), Adversarial (precomputed
-> FGSM comparison gallery — 4/10 sample predictions flip at ε=0.03, several
-> with 90%+ confidence in the wrong answer), and Compare (live Grad-CAM
-> computed fresh in your browser, shown next to precomputed Grad-CAM++ for
-> the same image) all work today.
+> **Status: Phase 3.5 — Layer Scrubber added.** All five tabs from the
+> original blueprint are now live: Grad-CAM (live, exact, any image),
+> **Layers** (scrub through network depth — stem → layer1 → layer2 → layer3
+> → layer4 — and watch a real image's activation energy shift from edges to
+> whole-object concepts, computed fresh in the browser), Features
+> (browsable filter gallery), Adversarial (precomputed FGSM comparison
+> gallery), and Compare (live Grad-CAM next to precomputed Grad-CAM++).
 
 ---
 
@@ -27,7 +28,8 @@ vision-interpretability-studio/
 │       └── src/
 │           ├── components/
 │           │   ├── workbench/       # layout shell, tab navigation
-│           │   ├── visualizations/  # GradCamView, FeatureVizView, AdversarialView, CompareView
+│           │   ├── visualizations/  # GradCamView, LayersView, FeatureVizView,
+│           │   │                    # AdversarialView, CompareView
 │           │   └── ui/              # shared primitives (ThemeToggle, etc.)
 │           ├── lib/
 │           │   ├── onnx/            # session setup, preprocessing, classify + exact Grad-CAM
@@ -74,6 +76,21 @@ exact Grad-CAM with zero backpropagation:
 
 This is why Grad-CAM works live for *any* image, upload or sample, with no
 server round-trip.
+
+## The Layer Scrubber
+
+Like Grad-CAM, the layer-scrubber (`LayersView`) needed no backpropagation
+— `ml/src/prepare_gradcam_export.py` exposes five stages of the network as
+extra graph outputs (the stem, and the final activation of each of the four
+residual layer groups), confirmed via `onnx.shape_inference` against the
+real model: 40×40 → 40×40 → 20×20 → 10×10 → 5×5 spatially, 64 → 64 → 128 →
+256 → 512 channels — textbook ResNet-18. One forward pass returns all five
+activation maps at once. For each stage, `computeEnergyMap()` in
+`inference.ts` takes the mean *absolute* activation across channels at each
+spatial location (not signed, not class-weighted — this is deliberately a
+different question from Grad-CAM: "where is this layer active" rather than
+"why this class"), normalizes to `[0, 1]`, and renders through the same
+`renderGradCamOverlay()` used everywhere else.
 
 ## Installation
 
@@ -126,14 +143,17 @@ npm run build
 > the way `&&` does.
 
 Expected result: all steps exit `0`. The test suite covers three areas —
-**16 tests total**:
+**22 tests total**:
 
-- `WorkbenchShell.test.tsx` (6) — all four tabs render, no "soon" badges
-  remain, clicking a tab switches its content, the Adversarial and Compare
-  tabs render their real intro copy
-- `lib/onnx/inference.test.ts` (6) — softmax is numerically stable and sums
+- `WorkbenchShell.test.tsx` (7) — all five tabs render, no "soon" badges
+  remain, clicking a tab switches its content, the Layers, Adversarial, and
+  Compare tabs render their real intro copy
+- `lib/onnx/inference.test.ts` (11) — softmax is numerically stable and sums
   to 1; the Grad-CAM math stays normalized to `[0, 1]`, never produces NaN,
-  and safely handles all-zero activations without dividing by zero
+  and safely handles all-zero activations; the layer-scrubber's energy-map
+  math is shape-correct, magnitude-based (not sign-based, unlike Grad-CAM),
+  correctly ranks high-activity locations above near-zero ones, and never
+  divides by zero
 - `lib/gradcam/renderOverlay.test.ts` (4) — bilinear upsampling produces the
   right output size, preserves uniform fields exactly, never overshoots the
   input range, and interpolates smoothly rather than blocking
@@ -143,7 +163,7 @@ in milliseconds. I additionally verified the actual trained model against
 real inference (Node.js via `onnxruntime-web`'s WASM backend, 10/10 sample
 predictions correct) and in a real headless browser via Playwright (full
 page load → model download → live inference → heatmap render, zero console
-errors) before shipping this phase — see the conversation history for those
+errors) before shipping each phase — see the conversation history for those
 runs if you want the details.
 
 ### Continuous Integration
@@ -156,13 +176,14 @@ math tests (numpy-only, no GPU) on Python 3.11, on every push and PR to
 
 ## Performance
 
-Tab content is code-split via `React.lazy` + `Suspense` — each of the four
-visualization views (`GradCamView`, `FeatureVizView`, `AdversarialView`,
-`CompareView`) is its own JS chunk, and the shared `onnxruntime-web` +
-inference code (~174KB) only downloads if you actually open the Grad-CAM or
-Compare tab. A visitor who only browses Features/Adversarial never pays for
-the ONNX runtime at all. The main shell chunk dropped from 513KB to 319KB as
-a result. The 13MB WASM binary itself is fetched separately by
+Tab content is code-split via `React.lazy` + `Suspense` — each of the five
+visualization views (`GradCamView`, `LayersView`, `FeatureVizView`,
+`AdversarialView`, `CompareView`) is its own JS chunk, and the shared
+`onnxruntime-web` + inference code (~175KB) only downloads if you actually
+open a tab that runs model inference (Grad-CAM, Layers, or Compare). A
+visitor who only browses Features/Adversarial never pays for the ONNX
+runtime at all. The main shell chunk dropped from 513KB to 319KB as a
+result. The 13MB WASM binary itself is fetched separately by
 `onnxruntime-web` only at the moment a model session is actually created —
 it was never part of the JS bundle to begin with.
 
@@ -186,11 +207,20 @@ it was never part of the JS bundle to begin with.
   confidence in the wrong class); the Compare tab runs live Grad-CAM in the
   browser right next to the precomputed Grad-CAM++ result for the same
   image, so you can see the two methods agree.
+- **Performance pass:** code-split the five visualization tabs so the ONNX
+  runtime only loads for tabs that need it. Main chunk 513KB → 319KB.
+- **Deployed to Vercel** — live, tested against a real production build.
+- **Phase 3.5 — Layer Scrubber:** the one real gap from the original
+  blueprint's Phase 3 — a live, per-image scrubber through network depth
+  (stem → layer1 → layer2 → layer3 → layer4), not the static filter gallery
+  Features already covers. Same forward-only-math philosophy as Grad-CAM:
+  no backpropagation, just activation magnitudes exposed via graph surgery
+  and verified against the real model before any UI was built.
 
 ## What's next
 
-Everything planned for the interpretability tool itself now works. Natural
-directions from here:
+Every tab from the original blueprint is now live. Natural directions from
+here:
 
 1. **Per-upload adversarial/Grad-CAM++** — true interactivity for *any*
    uploaded image (not just the 10 bundled samples) needs a backprop-capable
@@ -199,3 +229,6 @@ directions from here:
 2. **Model card / case-study write-up** — a short page documenting what was
    learned (e.g. how confidently the model can be fooled at a barely-visible
    ε=0.03) makes a stronger portfolio narrative than the tool alone.
+3. **Responsive / mobile pass** — the tool is desktop-first today; a proper
+   pass for smaller viewports is the other real gap flagged in the original
+   blueprint audit.

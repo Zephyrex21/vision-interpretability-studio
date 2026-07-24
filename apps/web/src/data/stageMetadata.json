@@ -1,0 +1,27 @@
+[
+  {
+    "name": "/backbone/maxpool/MaxPool_output_0",
+    "label": "stem",
+    "shape": ["batch", 64, 40, 40]
+  },
+  {
+    "name": "/backbone/layer1/layer1.1/relu_1/Relu_output_0",
+    "label": "layer1",
+    "shape": ["batch", 64, 40, 40]
+  },
+  {
+    "name": "/backbone/layer2/layer2.1/relu_1/Relu_output_0",
+    "label": "layer2",
+    "shape": ["batch", 128, 20, 20]
+  },
+  {
+    "name": "/backbone/layer3/layer3.1/relu_1/Relu_output_0",
+    "label": "layer3",
+    "shape": ["batch", 256, 10, 10]
+  },
+  {
+    "name": "/backbone/layer4/layer4.1/relu_1/Relu_output_0",
+    "label": "layer4",
+    "shape": ["batch", 512, 5, 5]
+  }
+]

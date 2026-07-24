@@ -122,14 +122,22 @@ python3 src/prepare_gradcam_export.py \
 ```
 
 This performs graph surgery to expose the last convolutional block's
-activation map as a second model output, and extracts the classifier head's
-weights to `fc_weights.json`. Together these let the browser compute an
-**exact** Grad-CAM as a single forward pass — no backpropagation needed. See
-the module docstring in `src/prepare_gradcam_export.py` for the full
-mathematical justification (short version: this architecture's
-GlobalAveragePool + single Linear head means Grad-CAM provably reduces to
-classic CAM, which only needs the Linear layer's own weights).
+activation map, **plus four earlier stages (stem, layer1, layer2, layer3)**,
+as additional model outputs, and extracts the classifier head's weights to
+`fc_weights.json`. Together these let the browser compute an **exact**
+Grad-CAM as a single forward pass — no backpropagation needed — and also
+power the layer-scrubber (`LayersView`), which shows how a real image's
+activation energy shifts through network depth. See the module docstring in
+`src/prepare_gradcam_export.py` for the full mathematical justification
+(short version: this architecture's GlobalAveragePool + single Linear head
+means Grad-CAM provably reduces to classic CAM, which only needs the Linear
+layer's own weights; the layer-scrubber needs no such trick at all since it
+only ever uses forward-pass activation magnitudes, never gradients).
 
-Then place `model_gradcam.onnx`, `fc_weights.json`, `class_labels.json`,
-`feature_viz/`, and a few `sample_images/` into the web app — see the root
-README's Phase 2 section for exactly where each file goes.
+Also writes `stage_metadata.json`, listing each exposed stage's tensor name,
+short label (stem/layer1/.../layer4), and shape.
+
+Then place `model_gradcam.onnx`, `fc_weights.json`, `stage_metadata.json`,
+`class_labels.json`, `feature_viz/`, and a few `sample_images/` into the web
+app — see the root README's Phase 2 section for exactly where each file
+goes.

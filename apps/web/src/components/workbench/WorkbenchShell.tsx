@@ -12,6 +12,9 @@ import styles from './WorkbenchShell.module.css';
 const GradCamView = lazy(() =>
   import('../visualizations/GradCamView').then((m) => ({ default: m.GradCamView })),
 );
+const LayersView = lazy(() =>
+  import('../visualizations/LayersView').then((m) => ({ default: m.LayersView })),
+);
 const FeatureVizView = lazy(() =>
   import('../visualizations/FeatureVizView').then((m) => ({ default: m.FeatureVizView })),
 );
@@ -24,6 +27,7 @@ const CompareView = lazy(() =>
 
 const TABS: { id: VisualizationTab; label: string; caption: string; status: 'live' | 'soon' }[] = [
   { id: 'gradcam', label: 'Grad-CAM', caption: 'What drove the decision', status: 'live' },
+  { id: 'layers', label: 'Layers', caption: 'How depth builds meaning', status: 'live' },
   { id: 'features', label: 'Features', caption: 'What each filter detects', status: 'live' },
   { id: 'adversarial', label: 'Adversarial', caption: 'How fragile is trust', status: 'live' },
   {
@@ -86,6 +90,7 @@ export function WorkbenchShell() {
 
           <Suspense fallback={<div className={styles.tabLoading}>Loading {active.label}…</div>}>
             {active.id === 'gradcam' && <GradCamView />}
+            {active.id === 'layers' && <LayersView />}
             {active.id === 'features' && <FeatureVizView />}
             {active.id === 'adversarial' && <AdversarialView />}
             {active.id === 'compare' && <CompareView />}

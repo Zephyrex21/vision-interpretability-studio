@@ -1,5 +1,6 @@
 """
-Prepares a Grad-CAM-capable ONNX export from the notebook's `model.onnx`.
+Prepares a Grad-CAM- and layer-scrubber-capable ONNX export from the
+notebook's `model.onnx`.
 
 Why this exists: plain ONNX Runtime (including onnxruntime-web in the
 browser) is inference-only — it has no backpropagation. Standard Grad-CAM
@@ -20,6 +21,11 @@ zero backpropagation:
   3. In the browser: one forward pass gives both the logits AND the
      activation map; the CAM is then `ReLU(sum_c W[class, c] * activation_c)`,
      computed as plain JS array math (see apps/web/src/lib/onnx/inference.ts).
+
+This same export also exposes the stem + all four residual stages' final
+activation maps (STAGE_TENSORS below), so the app's layer-scrubber can show
+how a real image's activations evolve through network depth — no gradients
+needed there either, just forward-pass activation magnitudes.
 
 Usage:
     python ml/src/prepare_gradcam_export.py \\
@@ -44,6 +50,17 @@ from onnx import helper, numpy_helper
 # inspect_graph() below to confirm the tensor name hasn't changed.
 TARGET_TENSOR = "/backbone/layer4/layer4.1/relu_1/Relu_output_0"
 ACTIVATION_SHAPE = ["batch", 512, 5, 5]  # 160x160 input -> 5x5 after layer4
+
+# All five stages exposed for the layer-scrubber, in network-depth order.
+# Shapes confirmed via onnx.shape_inference against this notebook's export —
+# re-verify with --inspect if you retrain with a different input resolution.
+STAGE_TENSORS: list[dict] = [
+    {"name": "/backbone/maxpool/MaxPool_output_0", "label": "stem", "shape": ["batch", 64, 40, 40]},
+    {"name": "/backbone/layer1/layer1.1/relu_1/Relu_output_0", "label": "layer1", "shape": ["batch", 64, 40, 40]},
+    {"name": "/backbone/layer2/layer2.1/relu_1/Relu_output_0", "label": "layer2", "shape": ["batch", 128, 20, 20]},
+    {"name": "/backbone/layer3/layer3.1/relu_1/Relu_output_0", "label": "layer3", "shape": ["batch", 256, 10, 10]},
+    {"name": TARGET_TENSOR, "label": "layer4", "shape": ACTIVATION_SHAPE},
+]
 
 
 def inspect_graph(model: onnx.ModelProto) -> None:
@@ -97,7 +114,9 @@ def add_activation_output(model: onnx.ModelProto, tensor_name: str, shape: list)
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", required=True, help="Path to the notebook's model.onnx")
-    parser.add_argument("--output-dir", required=True, help="Where to write model_gradcam.onnx and fc_weights.json")
+    parser.add_argument(
+        "--output-dir", required=True, help="Where to write model_gradcam.onnx, fc_weights.json, stage_metadata.json"
+    )
     parser.add_argument("--inspect", action="store_true", help="Print graph structure and exit (no output written)")
     args = parser.parse_args()
 
@@ -108,7 +127,8 @@ def main() -> None:
         return
 
     fc_weights = extract_fc_weights(model)
-    add_activation_output(model, TARGET_TENSOR, ACTIVATION_SHAPE)
+    for stage in STAGE_TENSORS:
+        add_activation_output(model, stage["name"], stage["shape"])
     onnx.checker.check_model(model)
 
     output_dir = Path(args.output_dir)
@@ -116,13 +136,17 @@ def main() -> None:
 
     onnx_out = output_dir / "model_gradcam.onnx"
     weights_out = output_dir / "fc_weights.json"
+    stages_out = output_dir / "stage_metadata.json"
 
     onnx.save(model, str(onnx_out))
     with open(weights_out, "w") as f:
         json.dump(fc_weights, f)
+    with open(stages_out, "w") as f:
+        json.dump(STAGE_TENSORS, f, indent=2)
 
     print(f"Wrote {onnx_out}")
     print(f"Wrote {weights_out}  (fc weight shape: {fc_weights['shape']})")
+    print(f"Wrote {stages_out}  ({len(STAGE_TENSORS)} stages)")
     print(f"Graph outputs: {[o.name for o in model.graph.output]}")
 
 
