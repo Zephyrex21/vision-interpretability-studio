@@ -1,66 +1,83 @@
 /**
  * Design tokens — Vision Interpretability Studio
+ * Claymorphism design system
  *
- * Palette rationale (Phase 0):
- * - Accent stays violet across both themes for brand consistency with the
- *   rest of the portfolio (AllowOrigin, Lumora, etc).
- * - Heatmap tokens use a cool-violet -> warm-amber diverging scale instead
- *   of a classic red/green "jet" colormap: it's colorblind-safer, it stays
- *   legible sitting on top of either theme's background, and it reads as
- *   "ours" rather than a generic scientific-plot default.
- * - Glass surfaces use very low-alpha whites/blacks so the same component
- *   markup works in both themes without conditional styling.
+ * Palette & shadow rationale:
+ * - Clay surfaces work by matching a surface's shadow pair to its own
+ *   background color family (soft light-side highlight + soft dark-side
+ *   shadow) so raised elements read as "molded from the same material,"
+ *   not just boxes with drop-shadows.
+ * - The tab bar is the signature interaction: an INACTIVE tab is raised
+ *   (--clay-raised), an ACTIVE tab is pressed in (--clay-pressed) — a
+ *   real physical metaphor for selection state, not an arbitrary color
+ *   swap. Used consistently anywhere a control has a literal pressed/
+ *   unpressed state (tabs, stage-scrubber, sample thumbnails).
+ * - Accent stays violet for brand continuity with the rest of the
+ *   portfolio, softened into a genuine clay tone rather than a flat UI
+ *   blue-violet.
+ * - Heatmap tokens are unchanged — they're functional (colorblind-safe,
+ *   legible over either theme), not decorative, so the redesign doesn't
+ *   touch them.
  */
 
 :root,
 [data-theme='dark'] {
   color-scheme: dark;
 
-  /* Surfaces */
-  --surface-canvas: #0b0b10;
-  --surface-panel: rgba(255, 255, 255, 0.04);
-  --surface-panel-border: rgba(255, 255, 255, 0.08);
-  --surface-raised: rgba(255, 255, 255, 0.07);
+  /* Surfaces — clay base sits slightly darker than cards molded on it */
+  --surface-canvas: #17171f;
+  --surface-panel: #1f2029;
+  --surface-panel-border: rgba(255, 255, 255, 0.06);
+  --surface-raised: #262837;
 
   /* Text */
-  --text-primary: #f4f3f8;
-  --text-secondary: #c7c6d1;
-  --text-muted: #9a9aa8;
+  --text-primary: #f2f1f8;
+  --text-secondary: #c4c3d1;
+  --text-muted: #8f8fa3;
 
   /* Accent */
-  --accent: #8b7cff;
-  --accent-strong: #a597ff;
-  --accent-contrast: #0b0b10;
+  --accent: #9b8cff;
+  --accent-strong: #b0a3ff;
+  --accent-soft: rgba(155, 140, 255, 0.16);
+  --accent-contrast: #14141c;
 
-  /* Heatmap scale (cool -> warm) */
+  /* Heatmap scale (cool -> warm), unchanged */
   --heat-low: #2a2470;
   --heat-mid: #8b3fbf;
   --heat-high: #ffb454;
 
   /* Semantic */
   --success: #4ade80;
-  --danger: #ff6b6b;
+  --danger: #ff7a7a;
   --warning: #ffb454;
 
-  /* Elevation / effects */
-  --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.35);
-  --blur-glass: 16px;
+  /* Claymorphism shadow pairs: light-side highlight + dark-side shadow,
+     tuned per surface so nested clay reads as one material, not layers. */
+  --clay-light: rgba(255, 255, 255, 0.05);
+  --clay-dark: rgba(0, 0, 0, 0.55);
+  --clay-raised: -7px -7px 14px var(--clay-light), 7px 7px 16px var(--clay-dark);
+  --clay-raised-sm: -4px -4px 8px var(--clay-light), 4px 4px 10px var(--clay-dark);
+  --clay-pressed: inset -5px -5px 10px var(--clay-light), inset 5px 5px 12px var(--clay-dark);
+  --clay-card: 10px 10px 24px rgba(0, 0, 0, 0.45), -8px -8px 20px rgba(255, 255, 255, 0.03);
+
+  --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.4);
 }
 
 [data-theme='light'] {
   color-scheme: light;
 
-  --surface-canvas: #fafafc;
-  --surface-panel: rgba(20, 21, 26, 0.03);
-  --surface-panel-border: rgba(20, 21, 26, 0.08);
-  --surface-raised: rgba(20, 21, 26, 0.05);
+  --surface-canvas: #e8eaf2;
+  --surface-panel: #eef0f8;
+  --surface-panel-border: rgba(20, 21, 26, 0.05);
+  --surface-raised: #f5f6fb;
 
-  --text-primary: #14151a;
-  --text-secondary: #3a3b44;
-  --text-muted: #5b5f6b;
+  --text-primary: #1c1d27;
+  --text-secondary: #4a4b5a;
+  --text-muted: #6d6e80;
 
   --accent: #6c5cff;
   --accent-strong: #5544e6;
+  --accent-soft: rgba(108, 92, 255, 0.1);
   --accent-contrast: #ffffff;
 
   --heat-low: #4b3fbf;
@@ -71,13 +88,20 @@
   --danger: #dc2626;
   --warning: #d97706;
 
-  --shadow-soft: 0 8px 30px rgba(20, 21, 26, 0.08);
-  --blur-glass: 16px;
+  --clay-light: rgba(255, 255, 255, 0.9);
+  --clay-dark: rgba(163, 172, 198, 0.55);
+  --clay-raised: -7px -7px 14px var(--clay-light), 7px 7px 16px var(--clay-dark);
+  --clay-raised-sm: -4px -4px 8px var(--clay-light), 4px 4px 10px var(--clay-dark);
+  --clay-pressed: inset -5px -5px 10px var(--clay-light), inset 5px 5px 12px var(--clay-dark);
+  --clay-card: 10px 10px 24px rgba(163, 172, 198, 0.45), -8px -8px 20px rgba(255, 255, 255, 0.85);
+
+  --shadow-soft: 0 8px 30px rgba(20, 21, 26, 0.1);
 }
 
 :root {
-  /* Type scale */
-  --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  /* Type scale — Fraunces (soft-edged serif) for display, echoing the
+     clay UI's rounded forms; Inter for body so long captions stay crisp. */
+  --font-display: 'Fraunces', 'Georgia', serif;
   --font-body: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
@@ -86,8 +110,8 @@
   --fs-base: 1rem;
   --fs-lg: 1.125rem;
   --fs-xl: 1.5rem;
-  --fs-2xl: 2rem;
-  --fs-3xl: 2.75rem;
+  --fs-2xl: 2.1rem;
+  --fs-3xl: 2.9rem;
 
   /* Spacing scale (4px base) */
   --space-1: 4px;
@@ -99,13 +123,16 @@
   --space-7: 48px;
   --space-8: 64px;
 
-  /* Radii */
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
+  /* Radii — larger than a flat-UI scale on purpose; clay forms are soft
+     and pillowy, not sharp-cornered boxes. */
+  --radius-sm: 14px;
+  --radius-md: 22px;
+  --radius-lg: 32px;
+  --radius-pill: 999px;
 
   /* Motion */
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-clay: cubic-bezier(0.34, 1.4, 0.64, 1);
   --duration-fast: 150ms;
   --duration-base: 250ms;
   --duration-slow: 400ms;

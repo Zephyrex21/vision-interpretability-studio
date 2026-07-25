@@ -136,6 +136,7 @@ export function GradCamView() {
                 className={styles.sampleThumb}
                 onClick={() => handleSelectSample(sample.filename)}
                 aria-label={`Use sample image: ${sample.label}`}
+                aria-pressed={activeSource === sampleImageUrl(sample.filename)}
               >
                 <img src={sampleImageUrl(sample.filename)} alt={sample.label} loading="lazy" />
               </button>

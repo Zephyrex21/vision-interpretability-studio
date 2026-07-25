@@ -1,10 +1,10 @@
 .shell {
-  max-width: 1040px;
+  max-width: 1080px;
   margin: 0 auto;
-  padding: var(--space-6) var(--space-5) var(--space-8);
+  padding: var(--space-7) var(--space-5) var(--space-8);
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-6);
 }
 
 .header {
@@ -14,114 +14,117 @@
   gap: var(--space-4);
 }
 
+.headerText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.eyebrowRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* A small molded "lens" — the one decorative signature flourish, tying the
+   clay material to the product's actual subject (seeing inside a model). */
+.orb {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--surface-raised);
+  box-shadow: var(--clay-raised-sm);
+  flex-shrink: 0;
+}
+
+.orbPupil {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
 .eyebrow {
-  margin: 0 0 var(--space-1);
+  margin: 0;
   font-size: var(--fs-xs);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--accent-strong);
   font-weight: 600;
+  font-family: var(--font-body);
 }
 
 .title {
-  font-size: var(--fs-2xl);
-  max-width: 34ch;
+  font-size: var(--fs-3xl);
+  font-weight: 600;
+  max-width: 30ch;
   color: var(--text-primary);
-}
-
-.imagePanel {
-  padding: var(--space-5);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.imagePlaceholder {
-  height: 180px;
-  border-radius: var(--radius-sm);
-  border: 1px dashed var(--surface-panel-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-  font-size: var(--fs-sm);
-}
-
-.predictionRow {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  font-family: var(--font-mono);
-}
-
-.predictionLabel {
-  color: var(--text-muted);
-  font-size: var(--fs-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.predictionValue {
-  color: var(--text-primary);
-  font-size: var(--fs-base);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
 }
 
 .tabs {
   display: flex;
-  gap: var(--space-2);
+  gap: var(--space-3);
   flex-wrap: wrap;
 }
 
+/**
+ * The signature interaction: an inactive tab is molded clay standing proud
+ * of the surface (outset dual-shadow); the active tab looks physically
+ * pressed into the surface (inset shadow). Selection state as a real
+ * tactile metaphor, not a color swap.
+ */
 .tabButton {
   position: relative;
-  background: transparent;
-  border: 1px solid var(--surface-panel-border);
+  background: var(--surface-raised);
+  border: none;
   color: var(--text-secondary);
-  border-radius: var(--radius-sm);
-  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  padding: var(--space-3) var(--space-5);
   font-family: var(--font-body);
   font-size: var(--fs-sm);
+  font-weight: 500;
   cursor: pointer;
-  overflow: hidden;
+  box-shadow: var(--clay-raised);
+  transition:
+    box-shadow var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
 }
 
-.tabButton[aria-pressed='true'] {
-  color: var(--accent-contrast);
+.tabButton:hover:not(.tabButtonActive) {
+  transform: translateY(-1px);
 }
 
-.tabHighlight {
-  position: absolute;
-  inset: 0;
-  background: var(--accent);
-  z-index: 0;
+.tabButton:active {
+  transform: translateY(1px);
+}
+
+.tabButtonActive {
+  color: var(--accent-strong);
+  box-shadow: var(--clay-pressed);
 }
 
 .tabContent {
-  position: relative;
-  z-index: 1;
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
 }
 
-.tabLabel {
-  position: relative;
-}
-
 .soonBadge {
-  position: relative;
   padding: 1px 6px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  background: var(--surface-raised);
+  background: var(--surface-panel);
   color: var(--text-muted);
-}
-
-.tabButton[aria-pressed='true'] .soonBadge {
-  background: rgba(255, 255, 255, 0.2);
-  color: var(--accent-contrast);
 }
 
 .stage {
@@ -166,5 +169,16 @@
 
   .title {
     font-size: var(--fs-xl);
+  }
+}
+
+/* Touch target sizing: targets pointer capability, not screen width, so a
+   narrow desktop window stays compact while an actual touchscreen — phone
+   or tablet — always gets comfortably tappable controls (44px is the
+   standard WCAG/Apple/Google minimum touch target). */
+@media (hover: none) and (pointer: coarse) {
+  .tabButton {
+    min-height: 44px;
+    padding: var(--space-3) var(--space-4);
   }
 }

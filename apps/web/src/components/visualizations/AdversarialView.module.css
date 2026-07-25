@@ -26,16 +26,26 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--surface-panel);
+  box-shadow: var(--clay-card);
 }
 
+/* NOTE: position/overflow/cursor/user-select/touch-action here are load-bearing —
+   touch-action: none is required for the Pointer Events drag handler in
+   AdversarialView.tsx to work correctly on touchscreens (without it, the
+   browser's native scroll gesture fights the drag). Don't remove these
+   when restyling. */
 .sliderWrapper {
   position: relative;
   aspect-ratio: 1;
   border-radius: var(--radius-sm);
   overflow: hidden;
-  border: 1px solid var(--surface-panel-border);
   cursor: ew-resize;
   user-select: none;
+  touch-action: none;
+  box-shadow: var(--clay-pressed);
 }
 
 .baseImage {
@@ -56,9 +66,9 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 2px;
+  width: 3px;
   background: var(--accent);
-  transform: translateX(-1px);
+  transform: translateX(-1.5px);
   pointer-events: none;
 }
 
@@ -67,12 +77,25 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--surface-raised);
+  transform: translate(-50%, -50%);
+  box-shadow: var(--clay-raised-sm);
+}
+
+.sliderHandle::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--accent);
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+  z-index: 1;
 }
 
 .sideLabel {
@@ -83,8 +106,8 @@
   text-transform: uppercase;
   color: #fff;
   background: rgba(0, 0, 0, 0.55);
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
   pointer-events: none;
 }
 
@@ -93,6 +116,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
+  padding: 0 var(--space-2) var(--space-1);
 }
 
 .predictionRow {
@@ -129,8 +153,9 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--danger);
-  border: 1px solid var(--danger);
-  border-radius: 999px;
-  padding: 1px 6px;
+  background: var(--surface-raised);
+  border-radius: var(--radius-pill);
+  padding: 2px 8px;
   white-space: nowrap;
+  box-shadow: var(--clay-raised-sm);
 }

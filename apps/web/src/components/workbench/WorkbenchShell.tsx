@@ -7,8 +7,8 @@ import styles from './WorkbenchShell.module.css';
 
 // Lazy-loaded per tab so a visitor who only opens, say, the Features tab
 // never downloads onnxruntime-web's JS wrapper (~500KB) at all — that code
-// only lives in the Grad-CAM and Compare chunks, which are the only two
-// tabs that actually run model inference.
+// only lives in the Grad-CAM, Layers, and Compare chunks, the only tabs
+// that actually run model inference.
 const GradCamView = lazy(() =>
   import('../visualizations/GradCamView').then((m) => ({ default: m.GradCamView })),
 );
@@ -45,8 +45,13 @@ export function WorkbenchShell() {
   return (
     <div className={styles.shell}>
       <header className={styles.header}>
-        <div>
-          <p className={styles.eyebrow}>Vision Interpretability Studio</p>
+        <div className={styles.headerText}>
+          <div className={styles.eyebrowRow}>
+            <span className={styles.orb} aria-hidden="true">
+              <span className={styles.orbPupil} />
+            </span>
+            <p className={styles.eyebrow}>Vision Interpretability Studio</p>
+          </div>
           <h1 className={styles.title}>See inside the model, not just its answer</h1>
         </div>
         <ThemeToggle />
@@ -59,17 +64,10 @@ export function WorkbenchShell() {
             <button
               key={tab.id}
               type="button"
-              className={styles.tabButton}
+              className={`${styles.tabButton} ${isActive ? styles.tabButtonActive : ''}`}
               aria-pressed={isActive}
               onClick={() => setActiveTab(tab.id)}
             >
-              {isActive && (
-                <motion.span
-                  layoutId="tab-highlight"
-                  className={styles.tabHighlight}
-                  transition={{ type: 'spring', stiffness: 500, damping: 40 }}
-                />
-              )}
               <span className={styles.tabContent}>
                 <span className={styles.tabLabel}>{tab.label}</span>
                 {tab.status === 'soon' && <span className={styles.soonBadge}>soon</span>}
@@ -79,7 +77,7 @@ export function WorkbenchShell() {
         })}
       </nav>
 
-      <main className={`${styles.stage} glass-panel`}>
+      <main className={`${styles.stage} clay-panel`}>
         <motion.div
           key={active.id}
           initial={{ opacity: 0, y: 8 }}

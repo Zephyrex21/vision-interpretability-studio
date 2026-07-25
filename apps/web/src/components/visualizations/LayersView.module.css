@@ -23,8 +23,8 @@
   aspect-ratio: 1;
   border-radius: var(--radius-md);
   overflow: hidden;
-  border: 1px solid var(--surface-panel-border);
   background: var(--surface-raised);
+  box-shadow: var(--clay-pressed);
 }
 
 .canvas {
@@ -72,10 +72,11 @@
   aspect-ratio: 1;
   border-radius: var(--radius-sm);
   overflow: hidden;
-  border: 1px solid var(--surface-panel-border);
-  padding: 0;
+  padding: 2px;
   cursor: pointer;
-  background: none;
+  background: var(--surface-raised);
+  box-shadow: var(--clay-raised-sm);
+  transition: box-shadow var(--duration-fast) var(--ease-standard);
 }
 
 .sampleThumb img {
@@ -83,11 +84,11 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  border-radius: calc(var(--radius-sm) - 3px);
 }
 
 .sampleThumb[aria-pressed='true'] {
-  border-color: var(--accent);
-  border-width: 2px;
+  box-shadow: var(--clay-pressed);
 }
 
 .prediction {
@@ -105,9 +106,11 @@
 .scrubber {
   position: relative;
   display: flex;
-  border: 1px solid var(--surface-panel-border);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border-radius: var(--radius-md);
+  background: var(--surface-panel);
+  box-shadow: var(--clay-card);
 }
 
 .stageButton {
@@ -115,15 +118,16 @@
   flex: 1;
   background: transparent;
   border: none;
-  border-right: 1px solid var(--surface-panel-border);
+  border-radius: var(--radius-sm);
   color: var(--text-secondary);
   padding: var(--space-2) var(--space-1);
   font-size: var(--fs-xs);
+  font-weight: 500;
   cursor: pointer;
-}
-
-.stageButton:last-child {
-  border-right: none;
+  box-shadow: none;
+  transition:
+    box-shadow var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
 }
 
 .stageButton:disabled {
@@ -131,20 +135,14 @@
   opacity: 0.5;
 }
 
-.stageButton[aria-pressed='true'] {
-  color: var(--accent-contrast);
-}
-
-.stageHighlight {
-  position: absolute;
-  inset: 0;
-  background: var(--accent);
-  z-index: 0;
+.stageButtonActive {
+  color: var(--accent-strong);
+  background: var(--surface-raised);
+  box-shadow: var(--clay-pressed);
 }
 
 .stageLabel {
   position: relative;
-  z-index: 1;
   text-transform: capitalize;
 }
 
@@ -168,12 +166,23 @@
   display: inline-block;
   width: 60px;
   height: 8px;
-  border-radius: 4px;
+  border-radius: var(--radius-pill);
   background: linear-gradient(90deg, var(--heat-low), var(--heat-high));
 }
 
 @media (max-width: 720px) {
   .layout {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .stageButton {
+    min-height: 44px;
+    padding: var(--space-3) var(--space-1);
+  }
+
+  .sampleGrid {
+    grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
   }
 }

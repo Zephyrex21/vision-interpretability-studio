@@ -1,10 +1,10 @@
 # Vision Interpretability Studio
 
-An interactive, zero-cost, in-browser tool for seeing inside a vision model —
-live Grad-CAM and a browsable feature-visualization gallery today, with
-adversarial perturbation and Grad-CAM++ comparisons coming next. Inference
-runs entirely client-side via ONNX Runtime Web; there is no backend and no
-paid service anywhere in the stack.
+An interactive, zero-cost, in-browser tool for seeing inside a vision model
+— live Grad-CAM, a network-depth layer scrubber, a feature-visualization
+gallery, and adversarial-robustness comparisons, all running entirely
+client-side via ONNX Runtime Web. No backend, no paid service anywhere in
+the stack.
 
 > **Status: Phase 3.5 — Layer Scrubber added.** All five tabs from the
 > original blueprint are now live: Grad-CAM (live, exact, any image),
@@ -13,6 +13,21 @@ paid service anywhere in the stack.
 > whole-object concepts, computed fresh in the browser), Features
 > (browsable filter gallery), Adversarial (precomputed FGSM comparison
 > gallery), and Compare (live Grad-CAM next to precomputed Grad-CAM++).
+
+## Design
+
+A claymorphism system: every surface is molded from the same material as
+its background, distinguished by a light-side highlight + dark-side shadow
+pair rather than a hard border. The signature interaction ties the material
+to its function — an inactive tab or thumbnail sits raised off the surface
+(outset shadow), and selecting it presses it in (inset shadow), used
+consistently for every genuinely toggleable control (tabs, sample
+thumbnails, the layer-scrubber, class-override pills) rather than an
+arbitrary color swap. Type pairs **Fraunces** (a soft-edged serif, used
+sparingly for headings) with **Inter** for body copy, echoing the UI's
+rounded forms without tipping into a playful register. See
+`src/styles/tokens.css` for the full token system and the reasoning behind
+each shadow pair.
 
 ---
 
@@ -216,11 +231,23 @@ it was never part of the JS bundle to begin with.
   Features already covers. Same forward-only-math philosophy as Grad-CAM:
   no backpropagation, just activation magnitudes exposed via graph surgery
   and verified against the real model before any UI was built.
+- **Responsive / mobile pass:** found and fixed a real functional bug, not
+  just a sizing one — the Adversarial tab's reveal slider only listened for
+  `onMouseMove`, which never fires on touchscreens; on an actual phone it
+  would sit frozen. Rewrote it with the Pointer Events API (unifies mouse,
+  touch, and pen), which surfaced a second bug — a stale-closure race
+  between `pointerdown` and `pointermove` — caught via a Playwright test
+  that dispatches synthetic `pointerType: touch` events and asserts the
+  slider actually moves, not just that the page renders. Fixed with a ref
+  instead of state for the drag-gate. Also added `@media (hover: none) and
+  (pointer: coarse)` touch-target sizing (44px minimum, the WCAG/Apple/
+  Google standard) across all interactive controls — verified with real
+  device-emulated measurements before and after, not assumed.
 
 ## What's next
 
-Every tab from the original blueprint is now live. Natural directions from
-here:
+Every tab from the original blueprint is now live, deployed, and verified
+on both desktop and touch devices. Remaining direction:
 
 1. **Per-upload adversarial/Grad-CAM++** — true interactivity for *any*
    uploaded image (not just the 10 bundled samples) needs a backprop-capable
@@ -229,6 +256,3 @@ here:
 2. **Model card / case-study write-up** — a short page documenting what was
    learned (e.g. how confidently the model can be fooled at a barely-visible
    ε=0.03) makes a stronger portfolio narrative than the tool alone.
-3. **Responsive / mobile pass** — the tool is desktop-first today; a proper
-   pass for smaller viewports is the other real gap flagged in the original
-   blueprint audit.

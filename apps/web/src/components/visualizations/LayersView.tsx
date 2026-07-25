@@ -120,18 +120,11 @@ export function LayersView() {
                 <button
                   key={s.label}
                   type="button"
-                  className={styles.stageButton}
+                  className={`${styles.stageButton} ${isActive ? styles.stageButtonActive : ''}`}
                   aria-pressed={isActive}
                   disabled={status !== 'ready'}
                   onClick={() => setActiveStage(idx)}
                 >
-                  {isActive && (
-                    <motion.span
-                      layoutId="stage-highlight"
-                      className={styles.stageHighlight}
-                      transition={{ type: 'spring', stiffness: 500, damping: 40 }}
-                    />
-                  )}
                   <span className={styles.stageLabel}>{s.label}</span>
                 </button>
               );

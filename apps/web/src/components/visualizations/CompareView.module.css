@@ -15,19 +15,17 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-4);
 }
 
 .row {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
-  padding-bottom: var(--space-4);
-  border-bottom: 1px solid var(--surface-panel-border);
-}
-
-.row:last-child {
-  border-bottom: none;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--surface-panel);
+  box-shadow: var(--clay-card);
 }
 
 .pair {
@@ -42,8 +40,8 @@
   aspect-ratio: 1;
   border-radius: var(--radius-sm);
   overflow: hidden;
-  border: 1px solid var(--surface-panel-border);
   background: var(--surface-raised);
+  box-shadow: var(--clay-pressed);
 }
 
 .canvas {
@@ -62,8 +60,8 @@
   text-transform: uppercase;
   color: #fff;
   background: rgba(0, 0, 0, 0.55);
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 3px 7px;
+  border-radius: var(--radius-pill);
 }
 
 .rowMeta {
@@ -78,6 +76,7 @@
   text-transform: capitalize;
   color: var(--accent-strong);
   font-weight: 600;
+  font-family: var(--font-display);
 }
 
 .predictions {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import adversarialMetadata from '../../data/adversarialMetadata.json';
 import styles from './AdversarialView.module.css';
 
@@ -24,11 +24,94 @@ function compareUrl(file: string): string {
   return `/models/compare/${file}`;
 }
 
+/**
+ * One clean/adversarial comparison card with a drag-to-reveal slider.
+ *
+ * Uses the Pointer Events API (onPointerDown/Move/Up) rather than mouse-only
+ * handlers — Pointer Events unify mouse, touch, and pen into one API, which
+ * matters here because a plain `onMouseMove` handler never fires on
+ * touchscreens at all. Dragging is now the actual interaction on every
+ * input type, matching what the intro copy already says ("drag the
+ * slider") rather than the previous hover-only behavior, which only worked
+ * with a mouse and didn't even match its own instructions.
+ */
+function AdversarialCard({ entry }: { entry: AdversarialEntry }) {
+  const [reveal, setReveal] = useState(50);
+  const isDraggingRef = useRef(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const updateFromClientX = useCallback((clientX: number) => {
+    const rect = wrapperRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const pct = ((clientX - rect.left) / rect.width) * 100;
+    setReveal(Math.min(100, Math.max(0, pct)));
+  }, []);
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    isDraggingRef.current = true;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    updateFromClientX(e.clientX);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    // A ref, not state, gates this check: pointerdown -> pointermove can
+    // fire synchronously back-to-back (fast drags, or programmatic/test
+    // dispatch), and React state updates from pointerdown aren't guaranteed
+    // to have re-rendered yet by the time pointermove's closure runs. A ref
+    // mutates immediately, so there's no stale-read window.
+    if (!isDraggingRef.current) return;
+    updateFromClientX(e.clientX);
+  };
+
+  const stopDragging = () => {
+    isDraggingRef.current = false;
+  };
+
+  return (
+    <div className={styles.card}>
+      <div
+        ref={wrapperRef}
+        className={styles.sliderWrapper}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={stopDragging}
+        onPointerCancel={stopDragging}
+        onPointerLeave={stopDragging}
+      >
+        <img src={compareUrl(entry.clean_file)} alt="clean" className={styles.baseImage} />
+        <div className={styles.overlayClip} style={{ clipPath: `inset(0 ${100 - reveal}% 0 0)` }}>
+          <img
+            src={compareUrl(entry.adversarial_file)}
+            alt="adversarial"
+            className={styles.baseImage}
+          />
+        </div>
+        <div className={styles.sliderHandle} style={{ left: `${reveal}%` }} />
+        <span className={styles.sideLabel} style={{ left: 8 }}>
+          clean
+        </span>
+        <span className={styles.sideLabel} style={{ right: 8 }}>
+          adversarial
+        </span>
+      </div>
+
+      <div className={styles.meta}>
+        <div className={styles.predictionRow}>
+          <span className={!entry.flipped ? styles.predictionOk : styles.predictionMuted}>
+            {entry.clean_prediction} {(entry.clean_confidence * 100).toFixed(0)}%
+          </span>
+          <span className={styles.arrow}>→</span>
+          <span className={entry.flipped ? styles.predictionFlipped : styles.predictionOk}>
+            {entry.adversarial_prediction} {(entry.adversarial_confidence * 100).toFixed(0)}%
+          </span>
+        </div>
+        {entry.flipped && <span className={styles.flippedBadge}>flipped</span>}
+      </div>
+    </div>
+  );
+}
+
 export function AdversarialView() {
-  const [revealPct, setRevealPct] = useState<Record<number, number>>({});
-
-  const getReveal = (idx: number) => revealPct[idx] ?? 50;
-
   return (
     <div className={styles.container}>
       <p className={styles.intro}>
@@ -43,57 +126,9 @@ export function AdversarialView() {
       </p>
 
       <div className={styles.grid}>
-        {ENTRIES.map((entry) => {
-          const reveal = getReveal(entry.sample_index);
-          return (
-            <div key={entry.sample_index} className={styles.card}>
-              <div
-                className={styles.sliderWrapper}
-                onMouseMove={(e) => {
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  const pct = ((e.clientX - rect.left) / rect.width) * 100;
-                  setRevealPct((prev) => ({
-                    ...prev,
-                    [entry.sample_index]: Math.min(100, Math.max(0, pct)),
-                  }));
-                }}
-              >
-                <img src={compareUrl(entry.clean_file)} alt="clean" className={styles.baseImage} />
-                <div
-                  className={styles.overlayClip}
-                  style={{ clipPath: `inset(0 ${100 - reveal}% 0 0)` }}
-                >
-                  <img
-                    src={compareUrl(entry.adversarial_file)}
-                    alt="adversarial"
-                    className={styles.baseImage}
-                  />
-                </div>
-                <div className={styles.sliderHandle} style={{ left: `${reveal}%` }} />
-                <span className={styles.sideLabel} style={{ left: 8 }}>
-                  clean
-                </span>
-                <span className={styles.sideLabel} style={{ right: 8 }}>
-                  adversarial
-                </span>
-              </div>
-
-              <div className={styles.meta}>
-                <div className={styles.predictionRow}>
-                  <span className={!entry.flipped ? styles.predictionOk : styles.predictionMuted}>
-                    {entry.clean_prediction} {(entry.clean_confidence * 100).toFixed(0)}%
-                  </span>
-                  <span className={styles.arrow}>→</span>
-                  <span className={entry.flipped ? styles.predictionFlipped : styles.predictionOk}>
-                    {entry.adversarial_prediction} {(entry.adversarial_confidence * 100).toFixed(0)}
-                    %
-                  </span>
-                </div>
-                {entry.flipped && <span className={styles.flippedBadge}>flipped</span>}
-              </div>
-            </div>
-          );
-        })}
+        {ENTRIES.map((entry) => (
+          <AdversarialCard key={entry.sample_index} entry={entry} />
+        ))}
       </div>
     </div>
   );

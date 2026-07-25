@@ -15,8 +15,8 @@
   aspect-ratio: 1;
   border-radius: var(--radius-md);
   overflow: hidden;
-  border: 1px solid var(--surface-panel-border);
   background: var(--surface-raised);
+  box-shadow: var(--clay-pressed);
 }
 
 .canvas {
@@ -39,10 +39,10 @@
 }
 
 .resultCard {
-  padding: var(--space-4);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--surface-panel-border);
-  background: var(--surface-panel);
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  box-shadow: var(--clay-raised);
 }
 
 .resultHeader {
@@ -60,7 +60,8 @@
 }
 
 .resultValue {
-  font-family: var(--font-mono);
+  font-family: var(--font-display);
+  font-weight: 600;
   font-size: var(--fs-lg);
   color: var(--text-primary);
   text-transform: capitalize;
@@ -69,6 +70,7 @@
 .resultConfidence {
   color: var(--accent-strong);
   font-size: var(--fs-sm);
+  font-family: var(--font-mono);
 }
 
 .caption {
@@ -79,8 +81,9 @@
 
 .errorCard {
   padding: var(--space-4);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--danger);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  box-shadow: var(--clay-raised);
   color: var(--danger);
   font-size: var(--fs-sm);
 }
@@ -94,11 +97,16 @@
 .section {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--surface-panel);
+  box-shadow: var(--clay-card);
 }
 
 .sectionTitle {
   font-size: var(--fs-sm);
+  font-weight: 600;
   color: var(--text-secondary);
   margin: 0;
 }
@@ -120,10 +128,13 @@
   aspect-ratio: 1;
   border-radius: var(--radius-sm);
   overflow: hidden;
-  border: 1px solid var(--surface-panel-border);
-  padding: 0;
+  padding: 2px;
   cursor: pointer;
-  background: none;
+  background: var(--surface-raised);
+  box-shadow: var(--clay-raised-sm);
+  transition:
+    box-shadow var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
 }
 
 .sampleThumb img {
@@ -131,28 +142,34 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  border-radius: calc(var(--radius-sm) - 3px);
 }
 
 .sampleThumb:hover {
-  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.sampleThumb[aria-pressed='true'] {
+  box-shadow: var(--clay-pressed);
 }
 
 .uploadZone {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px dashed var(--surface-panel-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   padding: var(--space-4);
   cursor: pointer;
   color: var(--text-muted);
   font-size: var(--fs-sm);
   text-align: center;
+  background: var(--surface-panel);
+  box-shadow: var(--clay-card);
+  transition: color var(--duration-fast) var(--ease-standard);
 }
 
 .uploadZone:hover {
-  border-color: var(--accent);
-  color: var(--text-secondary);
+  color: var(--accent-strong);
 }
 
 .uploadInput {
@@ -166,24 +183,28 @@
 .classList {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-1);
+  gap: var(--space-2);
 }
 
 .classButton {
-  background: transparent;
-  border: 1px solid var(--surface-panel-border);
+  background: var(--surface-raised);
+  border: none;
   color: var(--text-secondary);
-  border-radius: 999px;
-  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  padding: var(--space-2) var(--space-4);
   font-size: var(--fs-xs);
+  font-weight: 500;
   cursor: pointer;
   text-transform: capitalize;
+  box-shadow: var(--clay-raised-sm);
+  transition:
+    box-shadow var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
 }
 
 .classButton[aria-pressed='true'] {
-  background: var(--accent);
-  color: var(--accent-contrast);
-  border-color: var(--accent);
+  color: var(--accent-strong);
+  box-shadow: var(--clay-pressed);
 }
 
 @media (max-width: 720px) {
@@ -193,5 +214,20 @@
 
   .sampleGrid {
     grid-template-columns: repeat(5, 1fr);
+  }
+
+  .sectionCaption {
+    font-size: var(--fs-sm);
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .classButton {
+    min-height: 44px;
+    padding: var(--space-2) var(--space-4);
+  }
+
+  .sampleGrid {
+    grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
   }
 }
