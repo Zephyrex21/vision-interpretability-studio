@@ -1,0 +1,125 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: var(--space-5);
+}
+
+.card {
+  background: var(--surface-panel);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--clay-card);
+  max-width: 460px;
+  width: 100%;
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: var(--fs-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.intro {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+}
+
+.list {
+  list-style: none;
+  margin: var(--space-2) 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.listItem {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  box-shadow: var(--clay-raised-sm);
+}
+
+.listLabel {
+  flex-shrink: 0;
+  min-width: 84px;
+  font-weight: 600;
+  color: var(--accent-strong);
+  font-size: var(--fs-sm);
+}
+
+.listBlurb {
+  color: var(--text-muted);
+  font-size: var(--fs-xs);
+  line-height: 1.5;
+}
+
+.dismissButton {
+  align-self: flex-start;
+  margin-top: var(--space-2);
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: var(--space-3) var(--space-6);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--clay-raised-sm);
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+.dismissButton:hover {
+  transform: translateY(-1px);
+}
+
+.dismissButton:active {
+  transform: translateY(1px);
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .dismissButton {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 520px) {
+  .card {
+    padding: var(--space-5);
+  }
+
+  .listItem {
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .listLabel {
+    min-width: 0;
+  }
+}

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useWorkbench } from '../../state/WorkbenchContext';
 import type { VisualizationTab } from '../../state/WorkbenchContext';
 import { ThemeToggle } from '../ui/ThemeToggle';
+import { OnboardingTour } from './OnboardingTour';
 import styles from './WorkbenchShell.module.css';
 
 // Lazy-loaded per tab so a visitor who only opens, say, the Features tab
@@ -44,6 +45,8 @@ export function WorkbenchShell() {
 
   return (
     <div className={styles.shell}>
+      <OnboardingTour />
+
       <header className={styles.header}>
         <div className={styles.headerText}>
           <div className={styles.eyebrowRow}>

@@ -6,13 +6,18 @@ gallery, and adversarial-robustness comparisons, all running entirely
 client-side via ONNX Runtime Web. No backend, no paid service anywhere in
 the stack.
 
-> **Status: Phase 3.5 — Layer Scrubber added.** All five tabs from the
-> original blueprint are now live: Grad-CAM (live, exact, any image),
-> **Layers** (scrub through network depth — stem → layer1 → layer2 → layer3
-> → layer4 — and watch a real image's activation energy shift from edges to
-> whole-object concepts, computed fresh in the browser), Features
-> (browsable filter gallery), Adversarial (precomputed FGSM comparison
-> gallery), and Compare (live Grad-CAM next to precomputed Grad-CAM++).
+> **Status: all five blueprint phases done, plus polish.** All five tabs
+> are live: Grad-CAM (live, exact, any image), **Layers** (scrub through
+> network depth — stem → layer1 → layer2 → layer3 → layer4 — and watch a
+> real image's activation energy shift from edges to whole-object concepts,
+> computed fresh in the browser), Features (browsable filter gallery),
+> Adversarial (precomputed FGSM comparison gallery), and Compare (live
+> Grad-CAM next to precomputed Grad-CAM++). Deployed, mobile-tested,
+> claymorphism redesign, first-visit onboarding tour. See
+> [`CASE_STUDY.md`](./CASE_STUDY.md) for the full write-up — the
+> inference-only ONNX constraint, the CAM-equivalence trick that made exact
+> live Grad-CAM possible anyway, and the most interesting things the model
+> actually did.
 
 ## Design
 
@@ -157,12 +162,16 @@ npm run build
 > approaches run the same checks; `;` just doesn't stop on the first failure
 > the way `&&` does.
 
-Expected result: all steps exit `0`. The test suite covers three areas —
-**22 tests total**:
+Expected result: all steps exit `0`. The test suite covers four areas —
+**28 tests total**:
 
 - `WorkbenchShell.test.tsx` (7) — all five tabs render, no "soon" badges
   remain, clicking a tab switches its content, the Layers, Adversarial, and
   Compare tabs render their real intro copy
+- `OnboardingTour.test.tsx` (6) — shows on a first visit, lists all five
+  tabs, stays hidden if the `localStorage` flag is already set, and
+  correctly persists dismissal via the button, the Escape key, and a
+  backdrop click
 - `lib/onnx/inference.test.ts` (11) — softmax is numerically stable and sums
   to 1; the Grad-CAM math stays normalized to `[0, 1]`, never produces NaN,
   and safely handles all-zero activations; the layer-scrubber's energy-map
@@ -243,16 +252,24 @@ it was never part of the JS bundle to begin with.
   (pointer: coarse)` touch-target sizing (44px minimum, the WCAG/Apple/
   Google standard) across all interactive controls — verified with real
   device-emulated measurements before and after, not assumed.
+- **Claymorphism redesign:** every surface rebuilt around a real physical
+  metaphor — controls with genuine on/off state (tabs, sample thumbnails,
+  the layer-scrubber) look physically pressed in when active rather than
+  just color-swapped. Verified with computed-style assertions (active tabs
+  genuinely carry an `inset` box-shadow) and pixel-sampled screenshots
+  confirming exact color-token matches across all 5 tabs and both themes —
+  and re-ran the touch-drag regression test from the mobile pass to confirm
+  the visual overhaul didn't quietly break the interaction fix underneath it.
+- **Onboarding tour + case study:** a first-visit modal introduces the tool
+  and its five tabs (dismissal persisted via `localStorage`, tested for
+  both the dismiss button and Escape/backdrop-click paths). See
+  [`CASE_STUDY.md`](./CASE_STUDY.md) for the full narrative write-up.
 
 ## What's next
 
-Every tab from the original blueprint is now live, deployed, and verified
-on both desktop and touch devices. Remaining direction:
-
-1. **Per-upload adversarial/Grad-CAM++** — true interactivity for *any*
-   uploaded image (not just the 10 bundled samples) needs a backprop-capable
-   in-browser runtime, e.g. re-hosting the trained weights in TensorFlow.js.
-   Bigger lift, tracked as a stretch goal.
-2. **Model card / case-study write-up** — a short page documenting what was
-   learned (e.g. how confidently the model can be fooled at a barely-visible
-   ε=0.03) makes a stronger portfolio narrative than the tool alone.
+Every phase from the original blueprint is complete. The one remaining
+direction is **per-upload adversarial/Grad-CAM++** — true interactivity for
+*any* uploaded image (not just the 10 bundled samples) needs a
+backprop-capable in-browser runtime, e.g. re-hosting the trained weights in
+TensorFlow.js. A genuinely bigger lift than anything else here, tracked as
+a stretch goal rather than rushed.
