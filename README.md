@@ -162,16 +162,23 @@ npm run build
 > approaches run the same checks; `;` just doesn't stop on the first failure
 > the way `&&` does.
 
-Expected result: all steps exit `0`. The test suite covers four areas —
-**28 tests total**:
+Expected result: all steps exit `0`. The test suite covers six areas —
+**41 tests total**:
 
-- `WorkbenchShell.test.tsx` (7) — all five tabs render, no "soon" badges
+- `WorkbenchShell.test.tsx` (8) — all five tabs render, no "soon" badges
   remain, clicking a tab switches its content, the Layers, Adversarial, and
-  Compare tabs render their real intro copy
-- `OnboardingTour.test.tsx` (6) — shows on a first visit, lists all five
-  tabs, stays hidden if the `localStorage` flag is already set, and
-  correctly persists dismissal via the button, the Escape key, and a
-  backdrop click
+  Compare tabs render their real intro copy, and the header help button
+  reopens the onboarding tour even for a returning visitor
+- `OnboardingTour.test.tsx` (7) — a controlled component (open/onDismiss
+  props, no internal state) that renders correctly for both `open` values,
+  lists all five tabs, and calls `onDismiss` for the button, Escape key,
+  and a backdrop click
+- `useOnboardingTour.test.ts` (5) — the hook backing the tour: opens on a
+  first visit, stays closed if already dismissed, and `openTour()`
+  correctly reopens it even after a prior dismissal
+- `InfoTip.test.tsx` (6) — the jargon-glossary popover: hidden initially,
+  opens on click, closes on a second click, closes on outside click, closes
+  on Escape, and exposes correct `aria-expanded` state
 - `lib/onnx/inference.test.ts` (11) — softmax is numerically stable and sums
   to 1; the Grad-CAM math stays normalized to `[0, 1]`, never produces NaN,
   and safely handles all-zero activations; the layer-scrubber's energy-map
@@ -264,12 +271,55 @@ it was never part of the JS bundle to begin with.
   and its five tabs (dismissal persisted via `localStorage`, tested for
   both the dismiss button and Escape/backdrop-click paths). See
   [`CASE_STUDY.md`](./CASE_STUDY.md) for the full narrative write-up.
+- **Comprehension pass:** after everything above was built and working, a
+  fresh audit asked a different question — could a non-technical visitor
+  actually follow what's happening? Three real gaps closed: (1) the
+  onboarding tour could only ever be seen once — its state was lifted into
+  a shared `useOnboardingTour` hook so a small header button can reopen it
+  anytime; (2) the Grad-CAM tab (the one every visitor sees first) had no
+  heatmap color legend at all, unlike the Layers tab — extracted into a
+  shared `HeatmapLegend` component and added to Grad-CAM and Compare too;
+  (3) loading states said only generic "Loading model…" regardless of
+  whether that meant a one-time 43MB download or an instant cached
+  inference — `session.ts` now exposes `isSessionReady()` so Grad-CAM and
+  Layers can show an accurate, reassuring message for each case. Verified
+  with a throttled-network Playwright test that specifically watches for
+  the download message appearing on a first load and *not* reappearing on
+  a second tab once the model is cached.
+- **Inline glossary tooltips:** a shared `InfoTip` component wraps jargon
+  terms (Fast Gradient Sign Method, epsilon, confidence, Grad-CAM++,
+  gradients, gradient ascent, activation) across all five tabs — tap/click
+  the term for a one-line plain-English definition, dismissible via the
+  same click, a click outside, or Escape. Deliberately click-based rather
+  than hover-based, for the same reason the Adversarial slider had to be
+  rewritten earlier: hover doesn't exist on touch devices. A real-browser
+  test across all 6 tooltip instances caught an actual bug before it
+  shipped — the popover text was rendering in Title Case because
+  `text-transform: capitalize` (set on Grad-CAM's predicted-label styling)
+  is an inherited CSS property and leaked into the tooltip, a nested
+  descendant. Fixed by explicitly resetting `text-transform: none` on the
+  shared component, which also protects it from the same issue in any
+  future context it's dropped into.
+- **Rewriting the two most confusing captions:** the Features tab's
+  filter-visualization images are genuinely abstract, near-psychedelic
+  patterns — the old intro explained *what* they were (gradient ascent
+  output) without addressing the actual reaction a first-time visitor has,
+  which is closer to "is this broken?" The copy now names that reaction
+  directly up front ("these will look like abstract patterns, not
+  recognizable objects — that's expected, not a rendering glitch") and
+  explains *why* early filters only recognize edges and colors, not whole
+  objects. The other half of this phase — explaining why Grad-CAM
+  confidence often reads a suspicious-looking 100.0% — turned out to
+  already be covered by the confidence `InfoTip` added in Phase B, so no
+  separate change was needed there.
 
 ## What's next
 
-Every phase from the original blueprint is complete. The one remaining
-direction is **per-upload adversarial/Grad-CAM++** — true interactivity for
-*any* uploaded image (not just the 10 bundled samples) needs a
-backprop-capable in-browser runtime, e.g. re-hosting the trained weights in
-TensorFlow.js. A genuinely bigger lift than anything else here, tracked as
-a stretch goal rather than rushed.
+Every phase from the original blueprint is complete, plus this comprehension
+pass (Phase A: reopenable onboarding, consistent heatmap legends, accurate
+loading states; Phase B: inline glossary tooltips; Phase C: rewritten
+confusing captions). The one remaining direction is **per-upload
+adversarial/Grad-CAM++** — true interactivity for *any* uploaded image (not
+just the 10 bundled samples) needs a backprop-capable in-browser runtime,
+e.g. re-hosting the trained weights in TensorFlow.js. A genuinely bigger
+lift than anything else here, tracked as a stretch goal rather than rushed.

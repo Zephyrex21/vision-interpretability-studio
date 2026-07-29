@@ -4,6 +4,8 @@ import { loadImageElement } from '../../lib/onnx/preprocess';
 import { renderGradCamOverlay } from '../../lib/gradcam/renderOverlay';
 import { SAMPLE_IMAGES, sampleImageUrl } from '../../data/sampleImages';
 import gradcamPpMetadata from '../../data/gradcamPpMetadata.json';
+import { HeatmapLegend } from '../ui/HeatmapLegend';
+import { InfoTip } from '../ui/InfoTip';
 import styles from './CompareView.module.css';
 
 interface GradCamPpEntry {
@@ -90,11 +92,19 @@ export function CompareView() {
       <p className={styles.intro}>
         The left heatmap in each pair is computed fresh, right now, in your browser — the same
         exact-Grad-CAM technique from the Grad-CAM tab. The right heatmap was precomputed on Kaggle
-        using Grad-CAM++, which needs real gradients through the whole network and can't run
-        client-side. They usually agree closely, since this architecture makes standard Grad-CAM
-        already exact — Grad-CAM++'s extra machinery mainly helps when an image contains multiple
-        instances of the same class.
+        using{' '}
+        <InfoTip definition="A refinement of Grad-CAM that weighs each pixel's contribution more precisely — most useful when a photo contains several examples of the same object.">
+          Grad-CAM++
+        </InfoTip>
+        , which needs real{' '}
+        <InfoTip definition="The calculus step that tells a model how to adjust — required to compute Grad-CAM++, but something a plain browser-based model can't do on its own.">
+          gradients
+        </InfoTip>{' '}
+        through the whole network and can't run client-side. They usually agree closely, since this
+        architecture makes standard Grad-CAM already exact — Grad-CAM++'s extra machinery mainly
+        helps when an image contains multiple instances of the same class.
       </p>
+      <HeatmapLegend />
       <div className={styles.list}>
         {PP_ENTRIES.map((entry) => (
           <CompareRow key={entry.sample_index} sampleIndex={entry.sample_index} />

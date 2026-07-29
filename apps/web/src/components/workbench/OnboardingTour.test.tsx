@@ -1,72 +1,73 @@
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { OnboardingTour } from './OnboardingTour';
 
-const STORAGE_KEY = 'vis-studio-onboarding-seen';
+function renderTour(open: boolean) {
+  const onDismiss = vi.fn();
+  const utils = render(<OnboardingTour open={open} onDismiss={onDismiss} />);
+  return { onDismiss, ...utils };
+}
 
 describe('OnboardingTour', () => {
-  beforeEach(() => {
-    window.localStorage.clear();
-  });
-
-  afterEach(() => {
-    window.localStorage.clear();
-  });
-
-  it('shows on a first visit (no localStorage flag set)', async () => {
-    render(<OnboardingTour />);
+  it('renders when open is true', async () => {
+    renderTour(true);
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
     expect(screen.getByText(/see inside a real vision model/i)).toBeInTheDocument();
   });
 
+  it('does not render when open is false', () => {
+    renderTour(false);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
   it('lists all five tabs with a short description each', async () => {
-    render(<OnboardingTour />);
+    renderTour(true);
     await screen.findByRole('dialog');
     for (const label of ['Grad-CAM', 'Layers', 'Features', 'Adversarial', 'Compare']) {
       expect(screen.getByText(label)).toBeInTheDocument();
     }
   });
 
-  it('does not show if the localStorage flag is already set', () => {
-    window.localStorage.setItem(STORAGE_KEY, 'true');
-    render(<OnboardingTour />);
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-  });
-
-  it('dismissing sets the localStorage flag and closes the dialog', async () => {
+  it('calls onDismiss when the "Start exploring" button is clicked', async () => {
     const user = userEvent.setup();
-    render(<OnboardingTour />);
-    const dialog = await screen.findByRole('dialog');
+    const { onDismiss } = renderTour(true);
+    await screen.findByRole('dialog');
 
     await user.click(screen.getByRole('button', { name: /start exploring/i }));
 
-    expect(window.localStorage.getItem(STORAGE_KEY)).toBe('true');
-    await waitForElementToBeRemoved(dialog);
+    expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 
-  it('pressing Escape dismisses the dialog and persists the flag', async () => {
+  it('calls onDismiss when Escape is pressed', async () => {
     const user = userEvent.setup();
-    render(<OnboardingTour />);
-    const dialog = await screen.findByRole('dialog');
+    const { onDismiss } = renderTour(true);
+    await screen.findByRole('dialog');
 
     await user.keyboard('{Escape}');
 
-    expect(window.localStorage.getItem(STORAGE_KEY)).toBe('true');
-    await waitForElementToBeRemoved(dialog);
+    expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 
-  it('clicking the backdrop dismisses the dialog', async () => {
+  it('calls onDismiss when the backdrop is clicked', async () => {
     const user = userEvent.setup();
-    render(<OnboardingTour />);
+    const { onDismiss } = renderTour(true);
     const dialog = await screen.findByRole('dialog');
 
-    // The backdrop is the dialog's parent element in this component's DOM structure.
     const backdrop = dialog.parentElement;
     expect(backdrop).not.toBeNull();
     await user.click(backdrop as HTMLElement);
 
-    expect(window.localStorage.getItem(STORAGE_KEY)).toBe('true');
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('unmounts (after its exit animation) when open flips from true to false', async () => {
+    const onDismiss = vi.fn();
+    const { rerender } = render(<OnboardingTour open={true} onDismiss={onDismiss} />);
+    const dialog = await screen.findByRole('dialog');
+
+    rerender(<OnboardingTour open={false} onDismiss={onDismiss} />);
+
     await waitForElementToBeRemoved(dialog);
   });
 });

@@ -3,8 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { classifyWithGradCam, CLASS_LABELS } from '../../lib/onnx/inference';
 import type { ClassificationResult } from '../../lib/onnx/inference';
 import { loadImageElement } from '../../lib/onnx/preprocess';
+import { isSessionReady } from '../../lib/onnx/session';
 import { renderGradCamOverlay } from '../../lib/gradcam/renderOverlay';
 import { SAMPLE_IMAGES, sampleImageUrl } from '../../data/sampleImages';
+import { HeatmapLegend } from '../ui/HeatmapLegend';
+import { InfoTip } from '../ui/InfoTip';
 import styles from './GradCamView.module.css';
 
 type Status = 'idle' | 'loading-model' | 'running' | 'ready' | 'error';
@@ -18,7 +21,12 @@ export function GradCamView() {
   const [selectedClassOverride, setSelectedClassOverride] = useState<number | null>(null);
 
   const runInference = useCallback(async (imageUrl: string, targetClassIdx?: number) => {
-    setStatus(targetClassIdx === undefined ? 'running' : 'running');
+    // isSessionReady() tells us whether the ~43MB model has already been
+    // downloaded and initialized in this page load. First-ever inference
+    // triggers that one-time download; every call after reuses the cached
+    // session. These are very different wait times and deserve different
+    // messages rather than one generic "loading" label.
+    setStatus(isSessionReady() ? 'running' : 'loading-model');
     setErrorMessage(null);
     try {
       const img = await loadImageElement(imageUrl);
@@ -87,7 +95,11 @@ export function GradCamView() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                <span>{status === 'loading-model' ? 'Loading model…' : 'Running inference…'}</span>
+                <span>
+                  {status === 'loading-model'
+                    ? 'Downloading the neural network (43MB, one-time)…'
+                    : 'Running the network on your image…'}
+                </span>
               </motion.div>
             )}
           </AnimatePresence>
@@ -106,15 +118,22 @@ export function GradCamView() {
               </span>
               <span className={styles.resultValue}>
                 {classification.predictedLabel}{' '}
-                <span className={styles.resultConfidence}>
-                  {(classification.confidence * 100).toFixed(1)}%
-                </span>
+                <InfoTip
+                  definition="How sure the model is about this answer. A very confident, correct prediction on an easy example is normal — it doesn't mean the result is faked."
+                  className={styles.resultConfidence}
+                >
+                  {`${(classification.confidence * 100).toFixed(1)}%`}
+                </InfoTip>
               </span>
             </div>
             <p className={styles.caption}>
               Heatmap shows the exact region driving this classification — computed as a real
               forward pass through the trained weights, not an approximation.
             </p>
+            <HeatmapLegend
+              label="low attention → high attention"
+              className={styles.legendSpacing}
+            />
           </motion.div>
         )}
 

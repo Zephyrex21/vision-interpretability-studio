@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { ThemeProvider } from '../../state/ThemeContext';
 import { WorkbenchProvider } from '../../state/WorkbenchContext';
 import { WorkbenchShell } from './WorkbenchShell';
@@ -16,6 +16,10 @@ function renderShell() {
 }
 
 describe('WorkbenchShell', () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+  });
+
   it('renders the studio title', () => {
     renderShell();
     expect(screen.getByText(/see inside the model/i)).toBeInTheDocument();
@@ -61,5 +65,17 @@ describe('WorkbenchShell', () => {
     expect(
       await screen.findByText(/computed fresh, right now, in your browser/i),
     ).toBeInTheDocument();
+  });
+
+  it('reopens the onboarding tour from the header help button even after it was dismissed', async () => {
+    window.localStorage.setItem('vis-studio-onboarding-seen', 'true'); // simulate a returning visitor
+    const user = userEvent.setup();
+    renderShell();
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /what is this tool/i }));
+
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
   });
 });

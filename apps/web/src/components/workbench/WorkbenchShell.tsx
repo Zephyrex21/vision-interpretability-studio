@@ -2,7 +2,9 @@ import { lazy, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { useWorkbench } from '../../state/WorkbenchContext';
 import type { VisualizationTab } from '../../state/WorkbenchContext';
+import { useOnboardingTour } from '../../state/useOnboardingTour';
 import { ThemeToggle } from '../ui/ThemeToggle';
+import { HelpButton } from '../ui/HelpButton';
 import { OnboardingTour } from './OnboardingTour';
 import styles from './WorkbenchShell.module.css';
 
@@ -41,11 +43,12 @@ const TABS: { id: VisualizationTab; label: string; caption: string; status: 'liv
 
 export function WorkbenchShell() {
   const { activeTab, setActiveTab } = useWorkbench();
+  const { isOpen, openTour, dismissTour } = useOnboardingTour();
   const active = TABS.find((t) => t.id === activeTab)!;
 
   return (
     <div className={styles.shell}>
-      <OnboardingTour />
+      <OnboardingTour open={isOpen} onDismiss={dismissTour} />
 
       <header className={styles.header}>
         <div className={styles.headerText}>
@@ -57,7 +60,10 @@ export function WorkbenchShell() {
           </div>
           <h1 className={styles.title}>See inside the model, not just its answer</h1>
         </div>
-        <ThemeToggle />
+        <div className={styles.headerActions}>
+          <HelpButton onClick={openTour} />
+          <ThemeToggle />
+        </div>
       </header>
 
       <nav className={styles.tabs} aria-label="Visualization mode">

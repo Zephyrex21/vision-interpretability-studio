@@ -24,6 +24,18 @@ ort.env.wasm.simd = true;
 const MODEL_URL = '/models/model_gradcam.onnx';
 
 let sessionPromise: Promise<ort.InferenceSession> | null = null;
+let sessionReady = false;
+
+/**
+ * Whether the ONNX session has already finished loading (model downloaded
+ * + WASM initialized). Callers use this to distinguish "this is the
+ * one-time ~43MB model download" from "this is just running the network
+ * on your image," which are very different wait times and deserve
+ * different loading messages rather than one generic spinner label.
+ */
+export function isSessionReady(): boolean {
+  return sessionReady;
+}
 
 /** Lazily creates (and caches) the ONNX Runtime Web inference session. */
 export function getSession(): Promise<ort.InferenceSession> {
@@ -31,6 +43,9 @@ export function getSession(): Promise<ort.InferenceSession> {
     sessionPromise = ort.InferenceSession.create(MODEL_URL, {
       executionProviders: ['wasm'],
       graphOptimizationLevel: 'all',
+    }).then((session) => {
+      sessionReady = true;
+      return session;
     });
   }
   return sessionPromise;

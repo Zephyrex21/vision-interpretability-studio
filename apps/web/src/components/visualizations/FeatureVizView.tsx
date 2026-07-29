@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import featureVizMetadata from '../../data/featureVizMetadata.json';
+import { InfoTip } from '../ui/InfoTip';
 import styles from './FeatureVizView.module.css';
 
 interface FeatureVizEntry {
@@ -12,7 +13,8 @@ interface FeatureVizEntry {
 const ENTRIES = featureVizMetadata as FeatureVizEntry[];
 
 const LAYER_DESCRIPTIONS: Record<string, string> = {
-  layer1: 'Earliest layer — filters respond to raw edges, colors, and simple gradients.',
+  layer1:
+    'Earliest layer — filters respond to raw edges, colors, and simple gradients. Expect these to look the most abstract.',
   layer2: 'Filters begin combining edges into small textures and repeating patterns.',
   layer3: 'Mid-depth filters detect more complex textures and partial shapes.',
   layer4: 'Deepest layer — filters respond to object-level parts and high-level concepts.',
@@ -29,9 +31,16 @@ export function FeatureVizView() {
   return (
     <div className={styles.container}>
       <p className={styles.intro}>
-        Each image below wasn't taken from a photo — it started as random noise and was shaped by
-        gradient ascent to maximize one filter's response, revealing what that filter has learned to
-        detect, independent of any particular input.
+        These images will look like abstract, almost psychedelic patterns rather than recognizable
+        objects — that's expected, not a rendering glitch. Each one wasn't taken from a photo; it
+        started as random noise and was shaped by{' '}
+        <InfoTip definition="Repeatedly nudging a random image, pixel by pixel, to make one specific filter respond as strongly as possible — the same core technique behind Grad-CAM, run backwards.">
+          gradient ascent
+        </InfoTip>{' '}
+        until it maximized one specific filter's response. Early filters only recognize simple
+        things like edges and colors, not whole objects, so their "ideal image" naturally looks like
+        a repeating texture rather than anything you'd recognize. It only starts looking object-like
+        in the deepest layer, below.
       </p>
 
       {layers.map((layer) => (

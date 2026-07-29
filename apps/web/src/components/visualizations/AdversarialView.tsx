@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 import adversarialMetadata from '../../data/adversarialMetadata.json';
+import { InfoTip } from '../ui/InfoTip';
 import styles from './AdversarialView.module.css';
 
 interface AdversarialEntry {
@@ -115,14 +116,24 @@ export function AdversarialView() {
   return (
     <div className={styles.container}>
       <p className={styles.intro}>
-        Each pair below was generated once, on Kaggle, using the Fast Gradient Sign Method: every
-        pixel nudged by at most <strong>ε = {EPSILON}</strong> — roughly{' '}
-        {(EPSILON * 100).toFixed(0)}% of full brightness — in the direction that most confuses the
-        model. Drag the slider to compare clean vs. adversarial.{' '}
+        Each pair below was generated once, on Kaggle, using the{' '}
+        <InfoTip definition="An algorithm that nudges every pixel slightly in whichever direction most confuses the model — named for using only the sign (+/-) of the gradient, not its size.">
+          Fast Gradient Sign Method
+        </InfoTip>
+        : every pixel nudged by at most{' '}
+        <InfoTip definition="The Greek letter used for the perturbation budget — how far any single pixel is allowed to shift. Smaller epsilon means a smaller, harder-to-notice change.">
+          {`ε = ${EPSILON}`}
+        </InfoTip>{' '}
+        — roughly {(EPSILON * 100).toFixed(0)}% of full brightness — in the direction that most
+        confuses the model. Drag the slider to compare clean vs. adversarial.{' '}
         <strong>
           {FLIPPED_COUNT}/{ENTRIES.length}
         </strong>{' '}
-        predictions flipped, several with over 90% confidence in the wrong answer.
+        predictions flipped, several with over 90%{' '}
+        <InfoTip definition="How sure the model is about its answer, as a percentage. A confident wrong answer here is exactly what makes this attack concerning.">
+          confidence
+        </InfoTip>{' '}
+        in the wrong answer.
       </p>
 
       <div className={styles.grid}>

@@ -154,22 +154,6 @@
   line-height: 1.5;
 }
 
-.legend {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--fs-xs);
-  color: var(--text-muted);
-}
-
-.legendSwatch {
-  display: inline-block;
-  width: 60px;
-  height: 8px;
-  border-radius: var(--radius-pill);
-  background: linear-gradient(90deg, var(--heat-low), var(--heat-high));
-}
-
 @media (max-width: 720px) {
   .layout {
     grid-template-columns: 1fr;

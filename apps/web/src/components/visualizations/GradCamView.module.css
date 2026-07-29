@@ -79,6 +79,10 @@
   font-size: var(--fs-sm);
 }
 
+.legendSpacing {
+  margin-top: var(--space-3);
+}
+
 .errorCard {
   padding: var(--space-4);
   border-radius: var(--radius-md);

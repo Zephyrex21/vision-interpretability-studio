@@ -1,8 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './OnboardingTour.module.css';
-
-const STORAGE_KEY = 'vis-studio-onboarding-seen';
 
 const HIGHLIGHTS = [
   { label: 'Grad-CAM', blurb: 'Upload any photo — see exactly what the model looked at, live.' },
@@ -12,50 +10,30 @@ const HIGHLIGHTS = [
   { label: 'Compare', blurb: 'Live Grad-CAM next to a precomputed Grad-CAM++ result.' },
 ];
 
-function hasSeenOnboarding(): boolean {
-  if (typeof window === 'undefined') return true;
-  try {
-    return window.localStorage.getItem(STORAGE_KEY) === 'true';
-  } catch {
-    return false;
-  }
+interface OnboardingTourProps {
+  open: boolean;
+  onDismiss: () => void;
 }
 
-function markOnboardingSeen(): void {
-  try {
-    window.localStorage.setItem(STORAGE_KEY, 'true');
-  } catch {
-    // localStorage unavailable (private browsing, etc.) — fine to skip
-    // persistence, the tour will just show again next visit.
-  }
-}
-
-export function OnboardingTour() {
-  const [open, setOpen] = useState(false);
+/**
+ * Presentational only — first-visit auto-show and the header's re-open
+ * button both live in `useOnboardingTour`, so there's one source of truth
+ * for whether this is open, not a local `useState` here that a re-open
+ * button elsewhere would have no way to trigger.
+ */
+export function OnboardingTour({ open, onDismiss }: OnboardingTourProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (!hasSeenOnboarding()) {
-      setOpen(true);
-    }
-  }, []);
 
   useEffect(() => {
     if (!open) return;
     closeButtonRef.current?.focus();
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') dismiss();
+      if (e.key === 'Escape') onDismiss();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
-
-  const dismiss = () => {
-    markOnboardingSeen();
-    setOpen(false);
-  };
+  }, [open, onDismiss]);
 
   return (
     <AnimatePresence>
@@ -65,7 +43,7 @@ export function OnboardingTour() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={dismiss}
+          onClick={onDismiss}
         >
           <motion.div
             role="dialog"
@@ -101,7 +79,7 @@ export function OnboardingTour() {
               ref={closeButtonRef}
               type="button"
               className={styles.dismissButton}
-              onClick={dismiss}
+              onClick={onDismiss}
             >
               Start exploring
             </button>

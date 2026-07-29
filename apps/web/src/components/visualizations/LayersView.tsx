@@ -3,8 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { classifyWithLayerActivations } from '../../lib/onnx/inference';
 import type { StageActivationMap } from '../../lib/onnx/inference';
 import { loadImageElement } from '../../lib/onnx/preprocess';
+import { isSessionReady } from '../../lib/onnx/session';
 import { renderGradCamOverlay } from '../../lib/gradcam/renderOverlay';
 import { SAMPLE_IMAGES, sampleImageUrl } from '../../data/sampleImages';
+import { HeatmapLegend } from '../ui/HeatmapLegend';
+import { InfoTip } from '../ui/InfoTip';
 import styles from './LayersView.module.css';
 
 const STAGE_CAPTIONS: Record<string, string> = {
@@ -15,7 +18,7 @@ const STAGE_CAPTIONS: Record<string, string> = {
   layer4: 'Whole-object concepts — this is what the final decision is based on.',
 };
 
-type Status = 'loading' | 'ready' | 'error';
+type Status = 'loading-model' | 'running' | 'ready' | 'error';
 
 export function LayersView() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -23,11 +26,13 @@ export function LayersView() {
   const [stages, setStages] = useState<StageActivationMap[]>([]);
   const [activeStage, setActiveStage] = useState(0);
   const [predictedLabel, setPredictedLabel] = useState<string | null>(null);
-  const [status, setStatus] = useState<Status>('loading');
+  const [status, setStatus] = useState<Status>('loading-model');
   const [activeSample, setActiveSample] = useState(SAMPLE_IMAGES[0].filename);
 
   const loadAndScrub = async (filename: string) => {
-    setStatus('loading');
+    // See the comment in GradCamView.tsx — isSessionReady() distinguishes
+    // the one-time ~43MB model download from a normal, fast forward pass.
+    setStatus(isSessionReady() ? 'running' : 'loading-model');
     try {
       const img = await loadImageElement(sampleImageUrl(filename));
       imgRef.current = img;
@@ -67,21 +72,27 @@ export function LayersView() {
       <p className={styles.intro}>
         Scrub through network depth to watch where activity concentrates as an image moves through
         the network — not a class explanation like Grad-CAM, just "where is this layer paying
-        attention." No gradients involved, just the raw activation magnitudes at each depth.
+        attention." No gradients involved, just the raw{' '}
+        <InfoTip definition="A neuron's output value after seeing the image — how strongly that specific detector fired, at every location in the image.">
+          activation
+        </InfoTip>{' '}
+        magnitudes at each depth.
       </p>
 
       <div className={styles.layout}>
         <div className={styles.canvasWrapper}>
           <canvas ref={canvasRef} className={styles.canvas} />
           <AnimatePresence>
-            {status === 'loading' && (
+            {(status === 'loading-model' || status === 'running') && (
               <motion.div
                 className={styles.loadingOverlay}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                Running inference…
+                {status === 'loading-model'
+                  ? 'Downloading the neural network (43MB, one-time)…'
+                  : 'Running the network on your image…'}
               </motion.div>
             )}
           </AnimatePresence>
@@ -146,10 +157,7 @@ export function LayersView() {
             )}
           </AnimatePresence>
 
-          <div className={styles.legend}>
-            <span className={styles.legendSwatch} />
-            <span>low activity → high activity</span>
-          </div>
+          <HeatmapLegend />
         </div>
       </div>
     </div>
