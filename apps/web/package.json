@@ -14,6 +14,7 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@tensorflow/tfjs": "^4.22.0",
     "framer-motion": "^12.42.2",
     "onnxruntime-web": "^1.27.0",
     "react": "^19.2.7",

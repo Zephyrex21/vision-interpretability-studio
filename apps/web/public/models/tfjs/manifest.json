@@ -1,0 +1,415 @@
+[
+  {
+    "name": "input_mean",
+    "shape": [
+      3
+    ],
+    "byteOffset": 0,
+    "byteLength": 12
+  },
+  {
+    "name": "input_std",
+    "shape": [
+      3
+    ],
+    "byteOffset": 12,
+    "byteLength": 12
+  },
+  {
+    "name": "conv0_kernel",
+    "shape": [
+      7,
+      7,
+      3,
+      64
+    ],
+    "byteOffset": 24,
+    "byteLength": 37632
+  },
+  {
+    "name": "conv0_bias",
+    "shape": [
+      64
+    ],
+    "byteOffset": 37656,
+    "byteLength": 256
+  },
+  {
+    "name": "conv1_kernel",
+    "shape": [
+      3,
+      3,
+      64,
+      64
+    ],
+    "byteOffset": 37912,
+    "byteLength": 147456
+  },
+  {
+    "name": "conv1_bias",
+    "shape": [
+      64
+    ],
+    "byteOffset": 185368,
+    "byteLength": 256
+  },
+  {
+    "name": "conv2_kernel",
+    "shape": [
+      3,
+      3,
+      64,
+      64
+    ],
+    "byteOffset": 185624,
+    "byteLength": 147456
+  },
+  {
+    "name": "conv2_bias",
+    "shape": [
+      64
+    ],
+    "byteOffset": 333080,
+    "byteLength": 256
+  },
+  {
+    "name": "conv3_kernel",
+    "shape": [
+      3,
+      3,
+      64,
+      64
+    ],
+    "byteOffset": 333336,
+    "byteLength": 147456
+  },
+  {
+    "name": "conv3_bias",
+    "shape": [
+      64
+    ],
+    "byteOffset": 480792,
+    "byteLength": 256
+  },
+  {
+    "name": "conv4_kernel",
+    "shape": [
+      3,
+      3,
+      64,
+      64
+    ],
+    "byteOffset": 481048,
+    "byteLength": 147456
+  },
+  {
+    "name": "conv4_bias",
+    "shape": [
+      64
+    ],
+    "byteOffset": 628504,
+    "byteLength": 256
+  },
+  {
+    "name": "conv5_kernel",
+    "shape": [
+      3,
+      3,
+      64,
+      128
+    ],
+    "byteOffset": 628760,
+    "byteLength": 294912
+  },
+  {
+    "name": "conv5_bias",
+    "shape": [
+      128
+    ],
+    "byteOffset": 923672,
+    "byteLength": 512
+  },
+  {
+    "name": "conv6_kernel",
+    "shape": [
+      3,
+      3,
+      128,
+      128
+    ],
+    "byteOffset": 924184,
+    "byteLength": 589824
+  },
+  {
+    "name": "conv6_bias",
+    "shape": [
+      128
+    ],
+    "byteOffset": 1514008,
+    "byteLength": 512
+  },
+  {
+    "name": "conv7_kernel",
+    "shape": [
+      1,
+      1,
+      64,
+      128
+    ],
+    "byteOffset": 1514520,
+    "byteLength": 32768
+  },
+  {
+    "name": "conv7_bias",
+    "shape": [
+      128
+    ],
+    "byteOffset": 1547288,
+    "byteLength": 512
+  },
+  {
+    "name": "conv8_kernel",
+    "shape": [
+      3,
+      3,
+      128,
+      128
+    ],
+    "byteOffset": 1547800,
+    "byteLength": 589824
+  },
+  {
+    "name": "conv8_bias",
+    "shape": [
+      128
+    ],
+    "byteOffset": 2137624,
+    "byteLength": 512
+  },
+  {
+    "name": "conv9_kernel",
+    "shape": [
+      3,
+      3,
+      128,
+      128
+    ],
+    "byteOffset": 2138136,
+    "byteLength": 589824
+  },
+  {
+    "name": "conv9_bias",
+    "shape": [
+      128
+    ],
+    "byteOffset": 2727960,
+    "byteLength": 512
+  },
+  {
+    "name": "conv10_kernel",
+    "shape": [
+      3,
+      3,
+      128,
+      256
+    ],
+    "byteOffset": 2728472,
+    "byteLength": 1179648
+  },
+  {
+    "name": "conv10_bias",
+    "shape": [
+      256
+    ],
+    "byteOffset": 3908120,
+    "byteLength": 1024
+  },
+  {
+    "name": "conv11_kernel",
+    "shape": [
+      3,
+      3,
+      256,
+      256
+    ],
+    "byteOffset": 3909144,
+    "byteLength": 2359296
+  },
+  {
+    "name": "conv11_bias",
+    "shape": [
+      256
+    ],
+    "byteOffset": 6268440,
+    "byteLength": 1024
+  },
+  {
+    "name": "conv12_kernel",
+    "shape": [
+      1,
+      1,
+      128,
+      256
+    ],
+    "byteOffset": 6269464,
+    "byteLength": 131072
+  },
+  {
+    "name": "conv12_bias",
+    "shape": [
+      256
+    ],
+    "byteOffset": 6400536,
+    "byteLength": 1024
+  },
+  {
+    "name": "conv13_kernel",
+    "shape": [
+      3,
+      3,
+      256,
+      256
+    ],
+    "byteOffset": 6401560,
+    "byteLength": 2359296
+  },
+  {
+    "name": "conv13_bias",
+    "shape": [
+      256
+    ],
+    "byteOffset": 8760856,
+    "byteLength": 1024
+  },
+  {
+    "name": "conv14_kernel",
+    "shape": [
+      3,
+      3,
+      256,
+      256
+    ],
+    "byteOffset": 8761880,
+    "byteLength": 2359296
+  },
+  {
+    "name": "conv14_bias",
+    "shape": [
+      256
+    ],
+    "byteOffset": 11121176,
+    "byteLength": 1024
+  },
+  {
+    "name": "conv15_kernel",
+    "shape": [
+      3,
+      3,
+      256,
+      512
+    ],
+    "byteOffset": 11122200,
+    "byteLength": 4718592
+  },
+  {
+    "name": "conv15_bias",
+    "shape": [
+      512
+    ],
+    "byteOffset": 15840792,
+    "byteLength": 2048
+  },
+  {
+    "name": "conv16_kernel",
+    "shape": [
+      3,
+      3,
+      512,
+      512
+    ],
+    "byteOffset": 15842840,
+    "byteLength": 9437184
+  },
+  {
+    "name": "conv16_bias",
+    "shape": [
+      512
+    ],
+    "byteOffset": 25280024,
+    "byteLength": 2048
+  },
+  {
+    "name": "conv17_kernel",
+    "shape": [
+      1,
+      1,
+      256,
+      512
+    ],
+    "byteOffset": 25282072,
+    "byteLength": 524288
+  },
+  {
+    "name": "conv17_bias",
+    "shape": [
+      512
+    ],
+    "byteOffset": 25806360,
+    "byteLength": 2048
+  },
+  {
+    "name": "conv18_kernel",
+    "shape": [
+      3,
+      3,
+      512,
+      512
+    ],
+    "byteOffset": 25808408,
+    "byteLength": 9437184
+  },
+  {
+    "name": "conv18_bias",
+    "shape": [
+      512
+    ],
+    "byteOffset": 35245592,
+    "byteLength": 2048
+  },
+  {
+    "name": "conv19_kernel",
+    "shape": [
+      3,
+      3,
+      512,
+      512
+    ],
+    "byteOffset": 35247640,
+    "byteLength": 9437184
+  },
+  {
+    "name": "conv19_bias",
+    "shape": [
+      512
+    ],
+    "byteOffset": 44684824,
+    "byteLength": 2048
+  },
+  {
+    "name": "fc_kernel",
+    "shape": [
+      512,
+      10
+    ],
+    "byteOffset": 44686872,
+    "byteLength": 20480
+  },
+  {
+    "name": "fc_bias",
+    "shape": [
+      10
+    ],
+    "byteOffset": 44707352,
+    "byteLength": 40
+  }
+]

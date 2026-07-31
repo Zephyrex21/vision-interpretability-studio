@@ -313,13 +313,77 @@ it was never part of the JS bundle to begin with.
   already be covered by the confidence `InfoTip` added in Phase B, so no
   separate change was needed there.
 
+## The TensorFlow.js stretch goal — true per-upload adversarial attacks
+
+Everything above uses ONNX Runtime Web, which is inference-only. FGSM
+genuinely needs the gradient of loss with respect to every input pixel —
+something ONNX Runtime can't compute — so the Adversarial tab's original
+gallery could only ever show 10 fixed, precomputed sample images. Closing
+that gap meant standing up a second, independent, gradient-capable engine.
+
+**The build, in order, each step verified before moving to the next:**
+
+1. **Feasibility spike first.** Before writing any real code, confirmed
+   `@tensorflow/tfjs` (the pure-JS package, not the native-binding
+   `tfjs-node`) actually computes gradients with respect to input pixels
+   through a conv layer — the exact primitive FGSM needs. This is what
+   de-risked the whole effort before committing hours to it.
+2. **Hand-ported ResNet-18** using TF.js's Core API (not the Layers API —
+   explicit numeric padding was required to exactly match ONNX's symmetric
+   zero-padding; `'same'`/`'valid'` semantics differ subtly from PyTorch's).
+   Inspected the actual ONNX graph node-by-node rather than assuming
+   textbook ResNet-18 — this caught something real: PyTorch's export had
+   already fused BatchNorm into the preceding Conv layer (no separate
+   BatchNormalization nodes exist in the graph), which simplified the port
+   to just Conv+bias, ReLU, and residual Add.
+3. **Weights extracted directly from the trained ONNX model**
+   (`ml/src/extract_weights_for_tfjs.py`), with conv kernels transposed
+   from PyTorch/ONNX's `[out,in,kH,kW]` layout to TensorFlow's
+   `[kH,kW,in,out]` — the one detail most likely to silently produce a
+   model that *runs* but gives wrong answers.
+4. **Numerically verified before trusting anything built on top**: the
+   TF.js port's logits matched the real ONNX model to a max difference of
+   **0.000006** across sample images — tighter than the original
+   PyTorch↔ONNX export's own parity check.
+5. **Real FGSM** (`lib/tfjs/fgsm.ts`, via `tf.grad`) validated against the
+   known-correct Kaggle/PyTorch reference: 10/10 clean predictions matched
+   exactly, 7/10 adversarial results matched exactly. The other 3 have an
+   honest, verified explanation — `sharp` (this pipeline's JPEG decoder)
+   and PIL (the notebook's) produce slightly different pixel values, and
+   FGSM's sign-based perturbation is inherently sensitive to exactly that
+   kind of difference for borderline pixels. This doesn't matter for the
+   shipped feature, which computes a fresh attack on whatever pixels the
+   browser itself decodes rather than trying to reproduce Kaggle's exact
+   numbers.
+6. **Real Grad-CAM++** (`lib/tfjs/gradcamPlusPlus.ts`, one real gradient via
+   `tf.grad` on the intermediate activation, then the same elementwise
+   weighting formula from the training notebook): 10/10 predictions
+   matched, every heatmap genuinely spatially-varying and non-degenerate.
+7. **Shipped as a fully isolated, lazy-loaded addition** — `LiveFgsmPlayground`
+   on the Adversarial tab lets you upload any photo and get a genuine,
+   live, gradient-based attack. `@tensorflow/tfjs` (~1MB) and its ~43MB
+   weight file are only fetched if you actually use this feature — a real
+   browser test confirmed **zero** TF.js-related network requests happen
+   just from opening the Adversarial tab and browsing the precomputed
+   gallery, and a second test confirmed uploading a real photo produces a
+   genuine result end-to-end.
+
+Live Grad-CAM++ isn't wired into the UI yet — the module is built and
+numerically verified (see step 6 above) but doesn't have a playground
+component the way FGSM does. That's the natural next increment, and a
+lower-risk one, since the hard verification work is already done.
+
 ## What's next
 
-Every phase from the original blueprint is complete, plus this comprehension
-pass (Phase A: reopenable onboarding, consistent heatmap legends, accurate
-loading states; Phase B: inline glossary tooltips; Phase C: rewritten
-confusing captions). The one remaining direction is **per-upload
-adversarial/Grad-CAM++** — true interactivity for *any* uploaded image (not
-just the 10 bundled samples) needs a backprop-capable in-browser runtime,
-e.g. re-hosting the trained weights in TensorFlow.js. A genuinely bigger
-lift than anything else here, tracked as a stretch goal rather than rushed.
+Every phase from the original blueprint is complete, plus the full
+comprehension pass (Phase A/B/C) and the TensorFlow.js stretch goal for
+true per-upload FGSM. Two remaining directions, both small relative to
+everything above:
+
+1. **Wire up live Grad-CAM++** the same way FGSM was — the module exists
+   and is verified, it just needs a UI.
+2. **Second-order polish**: an epsilon slider for the live FGSM playground
+   (currently fixed at 0.03, matching the precomputed gallery), and
+   possibly consolidating the "second engine" messaging so a first-time
+   visitor understands why the app downloads two different ~40MB+ files
+   for two different tabs rather than one.

@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import adversarialMetadata from '../../data/adversarialMetadata.json';
 import { InfoTip } from '../ui/InfoTip';
+import { LiveFgsmPlayground } from './LiveFgsmPlayground';
 import styles from './AdversarialView.module.css';
 
 interface AdversarialEntry {
@@ -141,6 +142,8 @@ export function AdversarialView() {
           <AdversarialCard key={entry.sample_index} entry={entry} />
         ))}
       </div>
+
+      <LiveFgsmPlayground />
     </div>
   );
 }
