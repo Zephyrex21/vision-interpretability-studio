@@ -367,23 +367,30 @@ that gap meant standing up a second, independent, gradient-capable engine.
    just from opening the Adversarial tab and browsing the precomputed
    gallery, and a second test confirmed uploading a real photo produces a
    genuine result end-to-end.
-
-Live Grad-CAM++ isn't wired into the UI yet — the module is built and
-numerically verified (see step 6 above) but doesn't have a playground
-component the way FGSM does. That's the natural next increment, and a
-lower-risk one, since the hard verification work is already done.
+8. **Live Grad-CAM++ shipped too**, on the Compare tab's own
+   `LiveGradCamPlusPlusPlayground` — upload any photo and see live
+   Grad-CAM (ONNX) next to true live Grad-CAM++ (TF.js, real gradients) for
+   that same image, both computed on demand. Both playgrounds dynamically
+   import the same `lib/tfjs/model` chunk, so a visitor who tries one
+   doesn't pay to download the ~43MB TF.js weights a second time when
+   trying the other — confirmed by checking the built chunk didn't
+   duplicate. Also fixed a real messaging inconsistency this surfaced:
+   Compare's intro previously said Grad-CAM++ "can't run client-side,"
+   which stopped being true the moment this playground shipped — the copy
+   now correctly explains that the *fast* engine used everywhere else in
+   the app can't, while a second, slower engine, used only here, can.
 
 ## What's next
 
-Every phase from the original blueprint is complete, plus the full
-comprehension pass (Phase A/B/C) and the TensorFlow.js stretch goal for
-true per-upload FGSM. Two remaining directions, both small relative to
-everything above:
+Every phase from the original blueprint is complete, the full comprehension
+pass (Phase A/B/C), and the TensorFlow.js stretch goal for true per-upload
+FGSM *and* Grad-CAM++. What's left is smaller, second-order polish:
 
-1. **Wire up live Grad-CAM++** the same way FGSM was — the module exists
-   and is verified, it just needs a UI.
-2. **Second-order polish**: an epsilon slider for the live FGSM playground
-   (currently fixed at 0.03, matching the precomputed gallery), and
-   possibly consolidating the "second engine" messaging so a first-time
-   visitor understands why the app downloads two different ~40MB+ files
-   for two different tabs rather than one.
+1. An epsilon slider for the live FGSM playground (currently fixed at 0.03,
+   matching the precomputed gallery) — would let a visitor feel out the
+   sensitivity themselves rather than only seeing one fixed value.
+2. Possibly consolidating the "second engine" messaging across both
+   playgrounds so a first-time visitor has a single clear mental model for
+   why the app downloads two different ~40MB+ files for two different
+   capabilities, rather than encountering that explanation twice,
+   independently, in two different tabs.

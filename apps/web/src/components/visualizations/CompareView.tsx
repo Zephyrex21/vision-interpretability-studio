@@ -6,6 +6,7 @@ import { SAMPLE_IMAGES, sampleImageUrl } from '../../data/sampleImages';
 import gradcamPpMetadata from '../../data/gradcamPpMetadata.json';
 import { HeatmapLegend } from '../ui/HeatmapLegend';
 import { InfoTip } from '../ui/InfoTip';
+import { LiveGradCamPlusPlusPlayground } from './LiveGradCamPlusPlusPlayground';
 import styles from './CompareView.module.css';
 
 interface GradCamPpEntry {
@@ -97,10 +98,12 @@ export function CompareView() {
           Grad-CAM++
         </InfoTip>
         , which needs real{' '}
-        <InfoTip definition="The calculus step that tells a model how to adjust — required to compute Grad-CAM++, but something a plain browser-based model can't do on its own.">
+        <InfoTip definition="The calculus step that tells a model how to adjust — required to compute Grad-CAM++, and something the fast engine used elsewhere in this app can't do, since it only runs predictions, not attacks.">
           gradients
         </InfoTip>{' '}
-        through the whole network and can't run client-side. They usually agree closely, since this
+        through the whole network — ONNX Runtime, the fast engine used everywhere else in this app,
+        can only run predictions, not compute those gradients. (The playground below runs a second,
+        slower engine that can, live, for any photo.) They usually agree closely, since this
         architecture makes standard Grad-CAM already exact — Grad-CAM++'s extra machinery mainly
         helps when an image contains multiple instances of the same class.
       </p>
@@ -110,6 +113,8 @@ export function CompareView() {
           <CompareRow key={entry.sample_index} sampleIndex={entry.sample_index} />
         ))}
       </div>
+
+      <LiveGradCamPlusPlusPlayground />
     </div>
   );
 }

@@ -1,0 +1,115 @@
+.container {
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--fs-lg);
+  color: var(--text-primary);
+}
+
+.description {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  max-width: 62ch;
+}
+
+.uploadZone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  text-align: center;
+  background: var(--surface-raised);
+  box-shadow: var(--clay-raised);
+  transition:
+    color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard);
+}
+
+.uploadZone:hover {
+  color: var(--accent-strong);
+}
+
+.uploadZone:active {
+  box-shadow: var(--clay-pressed);
+}
+
+.uploadInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.errorText {
+  margin: 0;
+  color: var(--danger);
+  font-size: var(--fs-sm);
+}
+
+.canvasRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  max-width: 520px;
+}
+
+.panel {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--surface-raised);
+  box-shadow: var(--clay-pressed);
+}
+
+.canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.panelLabel {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 3px 7px;
+  border-radius: var(--radius-pill);
+}
+
+.prediction {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+
+.prediction strong {
+  color: var(--accent-strong);
+  text-transform: capitalize;
+}
+
+@media (max-width: 480px) {
+  .canvasRow {
+    grid-template-columns: 1fr;
+    max-width: 280px;
+  }
+}
