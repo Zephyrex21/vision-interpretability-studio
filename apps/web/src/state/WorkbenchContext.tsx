@@ -1,5 +1,9 @@
-import { createContext, useContext, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
+import { WorkbenchContext } from './workbenchContext';
+import type { VisualizationTab, WorkbenchState } from './workbenchContext';
+
+export type { VisualizationTab, WorkbenchState } from './workbenchContext';
 
 /**
  * Shared workbench state — the single source of truth every visualization
@@ -7,22 +11,6 @@ import type { ReactNode } from 'react';
  * subscribes to. This is intentionally minimal in Phase 0; Phase 2 wires
  * it up to real ONNX inference results.
  */
-
-export type VisualizationTab = 'gradcam' | 'layers' | 'features' | 'adversarial' | 'compare';
-
-interface WorkbenchState {
-  activeTab: VisualizationTab;
-  setActiveTab: (tab: VisualizationTab) => void;
-  selectedImage: string | null;
-  setSelectedImage: (src: string | null) => void;
-  selectedLayer: number | null;
-  setSelectedLayer: (layer: number | null) => void;
-  predictedClass: string | null;
-  setPredictedClass: (label: string | null) => void;
-}
-
-const WorkbenchContext = createContext<WorkbenchState | undefined>(undefined);
-
 export function WorkbenchProvider({ children }: { children: ReactNode }) {
   const [activeTab, setActiveTab] = useState<VisualizationTab>('gradcam');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -44,10 +32,4 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
   );
 
   return <WorkbenchContext.Provider value={value}>{children}</WorkbenchContext.Provider>;
-}
-
-export function useWorkbench(): WorkbenchState {
-  const ctx = useContext(WorkbenchContext);
-  if (!ctx) throw new Error('useWorkbench must be used within a WorkbenchProvider');
-  return ctx;
 }

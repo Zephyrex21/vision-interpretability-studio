@@ -74,6 +74,7 @@ function AdversarialCard({ entry }: { entry: AdversarialEntry }) {
       <div
         ref={wrapperRef}
         className={styles.sliderWrapper}
+        data-testid={`adversarial-slider-${entry.sample_index}`}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={stopDragging}
@@ -88,7 +89,11 @@ function AdversarialCard({ entry }: { entry: AdversarialEntry }) {
             className={styles.baseImage}
           />
         </div>
-        <div className={styles.sliderHandle} style={{ left: `${reveal}%` }} />
+        <div
+          className={styles.sliderHandle}
+          data-testid={`adversarial-handle-${entry.sample_index}`}
+          style={{ left: `${reveal}%` }}
+        />
         <span className={styles.sideLabel} style={{ left: 8 }}>
           clean
         </span>

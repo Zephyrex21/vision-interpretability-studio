@@ -81,11 +81,13 @@ export function LayersView() {
 
       <div className={styles.layout}>
         <div className={styles.canvasWrapper}>
-          <canvas ref={canvasRef} className={styles.canvas} />
+          <canvas ref={canvasRef} className={styles.canvas} data-testid="layers-canvas" />
           <AnimatePresence>
             {(status === 'loading-model' || status === 'running') && (
               <motion.div
                 className={styles.loadingOverlay}
+                data-testid="model-loading-overlay"
+                data-loading-kind={status === 'loading-model' ? 'download' : 'inference'}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}

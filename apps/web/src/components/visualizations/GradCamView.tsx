@@ -86,11 +86,13 @@ export function GradCamView() {
     <div className={styles.container}>
       <div className={styles.canvasArea}>
         <div className={styles.canvasWrapper}>
-          <canvas ref={canvasRef} className={styles.canvas} />
+          <canvas ref={canvasRef} className={styles.canvas} data-testid="gradcam-canvas" />
           <AnimatePresence>
             {(status === 'running' || status === 'loading-model') && (
               <motion.div
                 className={styles.loadingOverlay}
+                data-testid="model-loading-overlay"
+                data-loading-kind={status === 'loading-model' ? 'download' : 'inference'}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -108,6 +110,7 @@ export function GradCamView() {
         {classification && status !== 'error' && (
           <motion.div
             className={styles.resultCard}
+            data-testid="gradcam-result"
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             key={classification.predictedLabel + classification.confidence}

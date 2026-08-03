@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { motion } from 'framer-motion';
-import { useWorkbench } from '../../state/WorkbenchContext';
+import { useWorkbench } from '../../state/useWorkbench';
 import type { VisualizationTab } from '../../state/WorkbenchContext';
 import { useOnboardingTour } from '../../state/useOnboardingTour';
 import { ThemeToggle } from '../ui/ThemeToggle';
@@ -73,6 +73,7 @@ export function WorkbenchShell() {
             <button
               key={tab.id}
               type="button"
+              data-testid={`tab-${tab.id}`}
               className={`${styles.tabButton} ${isActive ? styles.tabButtonActive : ''}`}
               aria-pressed={isActive}
               onClick={() => setActiveTab(tab.id)}

@@ -45,20 +45,22 @@ vision-interpretability-studio/
 │       ├── public/
 │       │   ├── models/             # model_gradcam.onnx, feature_viz/ images (fetched at runtime)
 │       │   └── samples/            # 10 demo images from the Kaggle validation set
-│       └── src/
-│           ├── components/
-│           │   ├── workbench/       # layout shell, tab navigation
-│           │   ├── visualizations/  # GradCamView, LayersView, FeatureVizView,
-│           │   │                    # AdversarialView, CompareView
-│           │   └── ui/              # shared primitives (ThemeToggle, etc.)
-│           ├── lib/
-│           │   ├── onnx/            # session setup, preprocessing, classify + exact Grad-CAM
-│           │   └── gradcam/         # canvas heatmap rendering (bilinear upsample + color scale)
-│           ├── data/                # bundled JSON: class labels, FC weights, sample/feature-viz/
-│           │                        # adversarial/Grad-CAM++ metadata
-│           ├── state/                # ThemeContext, WorkbenchContext
-│           ├── styles/               # design tokens (tokens.css), global.css
-│           └── test/                 # Vitest setup
+│       ├── src/
+│       │   ├── components/
+│       │   │   ├── workbench/       # layout shell, tab navigation
+│       │   │   ├── visualizations/  # GradCamView, LayersView, FeatureVizView,
+│       │   │   │                    # AdversarialView, CompareView
+│       │   │   └── ui/              # shared primitives (ThemeToggle, etc.)
+│       │   ├── lib/
+│       │   │   ├── onnx/            # session setup, preprocessing, classify + exact Grad-CAM
+│       │   │   └── gradcam/         # canvas heatmap rendering (bilinear upsample + color scale)
+│       │   ├── data/                # bundled JSON: class labels, FC weights, sample/feature-viz/
+│       │   │                        # adversarial/Grad-CAM++ metadata
+│       │   ├── state/                # context objects, providers, and hooks (theme + workbench)
+│       │   ├── styles/               # design tokens (tokens.css), global.css
+│       │   └── test/                 # Vitest setup
+│       ├── e2e/                      # Playwright specs — real browser, real model/weight files
+│       └── playwright.config.ts
 ├── ml/
 │   ├── notebooks/
 │   │   └── vision_interpretability_phase1.ipynb   # Kaggle training notebook
@@ -66,7 +68,7 @@ vision-interpretability-studio/
 │   │                          # prepare_gradcam_export.py, test_math.py
 │   ├── requirements.txt
 │   └── README.md
-├── .github/workflows/ci.yml  # lint, typecheck, test, build on every push/PR
+├── .github/workflows/ci.yml  # lint, typecheck, unit tests, e2e tests, build — every push/PR
 └── README.md                 # you are here
 ```
 
@@ -94,7 +96,7 @@ exact Grad-CAM with zero backpropagation:
    then `apps/web/src/lib/gradcam/renderOverlay.ts` bilinear-upsamples and
    colors it using the studio's design tokens.
 
-This is why Grad-CAM works live for *any* image, upload or sample, with no
+This is why Grad-CAM works live for _any_ image, upload or sample, with no
 server round-trip.
 
 ## The Layer Scrubber
@@ -106,7 +108,7 @@ residual layer groups), confirmed via `onnx.shape_inference` against the
 real model: 40×40 → 40×40 → 20×20 → 10×10 → 5×5 spatially, 64 → 64 → 128 →
 256 → 512 channels — textbook ResNet-18. One forward pass returns all five
 activation maps at once. For each stage, `computeEnergyMap()` in
-`inference.ts` takes the mean *absolute* activation across channels at each
+`inference.ts` takes the mean _absolute_ activation across channels at each
 spatial location (not signed, not class-weighted — this is deliberately a
 different question from Grad-CAM: "where is this layer active" rather than
 "why this class"), normalizes to `[0, 1]`, and renders through the same
@@ -138,14 +140,14 @@ a different class" to view a counterfactual heatmap.
 
 All commands below are run from `apps/web/`.
 
-| Command | What it checks |
-|---|---|
-| `npm run format:check` | Prettier formatting is consistent |
-| `npm run lint` | oxlint — 0 errors expected (`public/` vendored assets are excluded) |
-| `npx tsc -b` | TypeScript typecheck across the project |
-| `npm run test` | Vitest — math + component tests |
-| `npm run build` | Production build via `tsc -b && vite build` |
-| `npm run preview` | Serves the production build locally |
+| Command                | What it checks                                                      |
+| ---------------------- | ------------------------------------------------------------------- |
+| `npm run format:check` | Prettier formatting is consistent                                   |
+| `npm run lint`         | oxlint — 0 errors expected (`public/` vendored assets are excluded) |
+| `npx tsc -b`           | TypeScript typecheck across the project                             |
+| `npm run test`         | Vitest — math + component tests                                     |
+| `npm run build`        | Production build via `tsc -b && vite build`                         |
+| `npm run preview`      | Serves the production build locally                                 |
 
 ```bash
 npm run format:check
@@ -192,16 +194,42 @@ Expected result: all steps exit `0`. The test suite covers six areas —
 These are pure-logic tests and don't require a real model or GPU — they run
 in milliseconds. I additionally verified the actual trained model against
 real inference (Node.js via `onnxruntime-web`'s WASM backend, 10/10 sample
-predictions correct) and in a real headless browser via Playwright (full
-page load → model download → live inference → heatmap render, zero console
-errors) before shipping each phase — see the conversation history for those
-runs if you want the details.
+predictions correct).
+
+### End-to-end tests (Playwright)
+
+The browser-level checks previously done ad hoc — full page load → model
+download → live inference → heatmap render; the touch-drag adversarial
+slider; the lazy TF.js engine boundary; the download-vs-cached loading
+messages — are now a committed, runnable suite in `apps/web/e2e/`, not just
+a claim in this README. Run it with:
+
+```bash
+npx playwright install --with-deps chromium   # one-time, downloads a real browser
+npm run test:e2e
+```
+
+| Spec                        | What it checks                                                                                                                                                                                                |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `gradcam-flow.spec.ts`      | Real page load, real model download, real inference, a heatmap with actual non-blank pixel content, zero console errors; switching sample images reuses the cached session instead of re-downloading          |
+| `adversarial-touch.spec.ts` | Synthetic `pointerType: 'touch'` events against the reveal slider (run on a mobile-emulated project) — regression-tests the pointer-events/stale-closure fix directly, plus a 44px minimum touch-target check |
+| `tfjs-lazy-load.spec.ts`    | Opening the Adversarial tab and browsing the precomputed gallery fires zero requests for the ~43MB TF.js weight file; uploading a photo to the live playground does                                           |
+| `loading-messages.spec.ts`  | The one-time "downloading the model" message never reappears once the ONNX session is cached, even after switching tabs                                                                                       |
+
+These talk to the real model/weight files (served locally by `vite
+preview`, no external network needed beyond the one-time browser binary
+install), so expect them to take noticeably longer than the Vitest suite —
+they're not meant to run on every keystroke. `.github/workflows/ci.yml`
+runs them as a separate `e2e` job on every push/PR, uploading the
+Playwright HTML report as a build artifact on failure.
 
 ### Continuous Integration
 
-`.github/workflows/ci.yml` runs the frontend checks on Node 20 and the `ml/`
-math tests (numpy-only, no GPU) on Python 3.11, on every push and PR to
-`main`.
+`.github/workflows/ci.yml` runs three jobs on every push and PR to `main`:
+the frontend checks (format, lint, typecheck, Vitest, build) and a separate
+`e2e` job (installs a real Chromium via Playwright, runs the suite above
+against a local preview build) on Node 20, and the `ml/` math tests
+(numpy-only, no GPU) on Python 3.11.
 
 ---
 
@@ -256,7 +284,7 @@ it was never part of the JS bundle to begin with.
   that dispatches synthetic `pointerType: touch` events and asserts the
   slider actually moves, not just that the page renders. Fixed with a ref
   instead of state for the drag-gate. Also added `@media (hover: none) and
-  (pointer: coarse)` touch-target sizing (44px minimum, the WCAG/Apple/
+(pointer: coarse)` touch-target sizing (44px minimum, the WCAG/Apple/
   Google standard) across all interactive controls — verified with real
   device-emulated measurements before and after, not assumed.
 - **Claymorphism redesign:** every surface rebuilt around a real physical
@@ -283,9 +311,9 @@ it was never part of the JS bundle to begin with.
   whether that meant a one-time 43MB download or an instant cached
   inference — `session.ts` now exposes `isSessionReady()` so Grad-CAM and
   Layers can show an accurate, reassuring message for each case. Verified
-  with a throttled-network Playwright test that specifically watches for
-  the download message appearing on a first load and *not* reappearing on
-  a second tab once the model is cached.
+  by `e2e/loading-messages.spec.ts` — asserts the download message shows on
+  a first load and never reappears on a second tab once the ONNX session
+  (a module-level singleton) is cached.
 - **Inline glossary tooltips:** a shared `InfoTip` component wraps jargon
   terms (Fast Gradient Sign Method, epsilon, confidence, Grad-CAM++,
   gradients, gradient ascent, activation) across all five tabs — tap/click
@@ -302,12 +330,12 @@ it was never part of the JS bundle to begin with.
   future context it's dropped into.
 - **Rewriting the two most confusing captions:** the Features tab's
   filter-visualization images are genuinely abstract, near-psychedelic
-  patterns — the old intro explained *what* they were (gradient ascent
+  patterns — the old intro explained _what_ they were (gradient ascent
   output) without addressing the actual reaction a first-time visitor has,
   which is closer to "is this broken?" The copy now names that reaction
   directly up front ("these will look like abstract patterns, not
   recognizable objects — that's expected, not a rendering glitch") and
-  explains *why* early filters only recognize edges and colors, not whole
+  explains _why_ early filters only recognize edges and colors, not whole
   objects. The other half of this phase — explaining why Grad-CAM
   confidence often reads a suspicious-looking 100.0% — turned out to
   already be covered by the confidence `InfoTip` added in Phase B, so no
@@ -340,7 +368,7 @@ that gap meant standing up a second, independent, gradient-capable engine.
    (`ml/src/extract_weights_for_tfjs.py`), with conv kernels transposed
    from PyTorch/ONNX's `[out,in,kH,kW]` layout to TensorFlow's
    `[kH,kW,in,out]` — the one detail most likely to silently produce a
-   model that *runs* but gives wrong answers.
+   model that _runs_ but gives wrong answers.
 4. **Numerically verified before trusting anything built on top**: the
    TF.js port's logits matched the real ONNX model to a max difference of
    **0.000006** across sample images — tighter than the original
@@ -362,11 +390,11 @@ that gap meant standing up a second, independent, gradient-capable engine.
 7. **Shipped as a fully isolated, lazy-loaded addition** — `LiveFgsmPlayground`
    on the Adversarial tab lets you upload any photo and get a genuine,
    live, gradient-based attack. `@tensorflow/tfjs` (~1MB) and its ~43MB
-   weight file are only fetched if you actually use this feature — a real
-   browser test confirmed **zero** TF.js-related network requests happen
-   just from opening the Adversarial tab and browsing the precomputed
-   gallery, and a second test confirmed uploading a real photo produces a
-   genuine result end-to-end.
+   weight file are only fetched if you actually use this feature —
+   `e2e/tfjs-lazy-load.spec.ts` confirms **zero** TF.js-related network
+   requests happen just from opening the Adversarial tab and browsing the
+   precomputed gallery, and a second test confirms uploading a real photo
+   produces a genuine result end-to-end.
 8. **Live Grad-CAM++ shipped too**, on the Compare tab's own
    `LiveGradCamPlusPlusPlayground` — upload any photo and see live
    Grad-CAM (ONNX) next to true live Grad-CAM++ (TF.js, real gradients) for
@@ -377,14 +405,14 @@ that gap meant standing up a second, independent, gradient-capable engine.
    duplicate. Also fixed a real messaging inconsistency this surfaced:
    Compare's intro previously said Grad-CAM++ "can't run client-side,"
    which stopped being true the moment this playground shipped — the copy
-   now correctly explains that the *fast* engine used everywhere else in
+   now correctly explains that the _fast_ engine used everywhere else in
    the app can't, while a second, slower engine, used only here, can.
 
 ## What's next
 
 Every phase from the original blueprint is complete, the full comprehension
 pass (Phase A/B/C), and the TensorFlow.js stretch goal for true per-upload
-FGSM *and* Grad-CAM++. What's left is smaller, second-order polish:
+FGSM _and_ Grad-CAM++. What's left is smaller, second-order polish:
 
 1. An epsilon slider for the live FGSM playground (currently fixed at 0.03,
    matching the precomputed gallery) — would let a visitor feel out the

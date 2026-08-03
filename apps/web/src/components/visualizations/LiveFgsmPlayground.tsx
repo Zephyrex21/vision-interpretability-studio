@@ -83,12 +83,13 @@ export function LiveFgsmPlayground() {
           type="file"
           accept="image/*"
           className={styles.uploadInput}
+          data-testid="fgsm-upload-input"
           onChange={(e) => {
             const file = e.target.files?.[0];
             if (file) void handleFile(file);
           }}
         />
-        <span>
+        <span data-testid="fgsm-status" data-status={status}>
           {status === 'idle' && 'Click to upload a photo'}
           {status === 'loading-engine' && 'Downloading the attack engine (43MB, one-time)…'}
           {status === 'running' && 'Computing a real gradient-based attack…'}

@@ -4,7 +4,7 @@
 engineering problem that shaped almost every decision in it: plain ONNX
 Runtime Web can't backpropagate.**
 
-Live: [add your Vercel URL here] · Code: [add your GitHub URL here]
+Live: [vision-interpretability-studio.vercel.app](https://vision-interpretability-studio.vercel.app) · Code: [github.com/Zephyrex21/vision-interpretability-studio](https://github.com/Zephyrex21/vision-interpretability-studio)
 
 ---
 
