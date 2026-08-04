@@ -5,6 +5,16 @@
   gap: var(--space-3);
 }
 
+.heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.headingIcon {
+  color: var(--accent-strong);
+}
+
 .title {
   margin: 0;
   font-family: var(--font-display);
@@ -25,6 +35,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: var(--space-2);
   border-radius: var(--radius-md);
   padding: var(--space-4);
   cursor: pointer;
@@ -44,6 +55,37 @@
 
 .uploadZone:active {
   box-shadow: var(--clay-pressed);
+}
+
+.uploadZoneBusy {
+  color: var(--accent-strong);
+  box-shadow: var(--clay-pressed), var(--accent-glow);
+}
+
+.uploadIconAnimated {
+  color: var(--accent-strong);
+  animation: fgsmFloat 1.6s ease-in-out infinite;
+}
+
+.uploadIconSpin {
+  color: var(--accent-strong);
+  animation: fgsmSpin 0.9s linear infinite;
+}
+
+@keyframes fgsmFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes fgsmSpin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .uploadInput {

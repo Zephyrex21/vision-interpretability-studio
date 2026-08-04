@@ -2,37 +2,41 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
+  width: 62px;
+  height: 40px;
   background: var(--surface-raised);
   border: none;
   border-radius: var(--radius-pill);
-  padding: var(--space-2) var(--space-3);
+  padding: 0 9px;
   cursor: pointer;
-  color: var(--text-secondary);
-  font-family: var(--font-body);
-  font-size: var(--fs-xs);
-  font-weight: 500;
   box-shadow: var(--clay-pressed);
+}
+
+.trackIcon {
+  color: var(--text-muted);
+  position: relative;
+  z-index: 0;
+}
+
+.trackIcon:first-of-type {
+  margin-right: auto;
+}
+
+.trackIcon:last-of-type {
+  margin-left: auto;
 }
 
 .knob {
   position: absolute;
   left: 4px;
   top: 4px;
-  width: 16px;
-  height: 16px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-panel);
+  color: var(--accent-strong);
   box-shadow: var(--clay-raised-sm);
-}
-
-.label {
-  margin-left: 28px;
-}
-
-@media (hover: none) and (pointer: coarse) {
-  .toggle {
-    min-height: 44px;
-    padding: var(--space-2) var(--space-4);
-  }
 }

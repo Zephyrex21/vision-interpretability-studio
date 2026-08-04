@@ -1,20 +1,12 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-}
-
-.intro {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: var(--fs-sm);
-  max-width: 68ch;
-  line-height: 1.6;
+  gap: var(--space-6);
 }
 
 .layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(220px, 1fr);
+  grid-template-columns: minmax(0, 1.1fr) minmax(240px, 1fr);
   gap: var(--space-5);
 }
 
@@ -39,11 +31,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
+  padding: var(--space-4);
   background: rgba(0, 0, 0, 0.45);
   color: #fff;
   font-family: var(--font-mono);
   font-size: var(--fs-sm);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px);
 }
 
 .errorText {
@@ -62,33 +56,19 @@
   gap: var(--space-4);
 }
 
-.sampleGrid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: var(--space-2);
+.controlCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
 }
 
-.sampleThumb {
-  aspect-ratio: 1;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  padding: 2px;
-  cursor: pointer;
-  background: var(--surface-raised);
-  box-shadow: var(--clay-raised-sm);
-  transition: box-shadow var(--duration-fast) var(--ease-standard);
-}
-
-.sampleThumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  border-radius: calc(var(--radius-sm) - 3px);
-}
-
-.sampleThumb[aria-pressed='true'] {
-  box-shadow: var(--clay-pressed);
+.controlTitle {
+  margin: 0;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
 .prediction {
@@ -147,7 +127,7 @@
 }
 
 .stageCaption {
-  margin: 0;
+  margin: var(--space-3) 0 0;
   min-height: 2.6em;
   color: var(--text-muted);
   font-size: var(--fs-sm);
@@ -164,9 +144,5 @@
   .stageButton {
     min-height: 44px;
     padding: var(--space-3) var(--space-1);
-  }
-
-  .sampleGrid {
-    grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
   }
 }

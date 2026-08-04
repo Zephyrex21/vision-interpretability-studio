@@ -1,8 +1,17 @@
 import { useCallback, useRef, useState } from 'react';
+import { CloudDownload, Loader2, Sparkles, Upload } from 'lucide-react';
 import { InfoTip } from '../ui/InfoTip';
 import styles from './LiveGradCamPlusPlusPlayground.module.css';
 
 type Status = 'idle' | 'loading-engine' | 'running' | 'ready' | 'error';
+
+const STATUS_COPY: Record<Status, string> = {
+  idle: 'Click to upload a photo',
+  'loading-engine': 'Downloading the attack engine (43MB, one-time)…',
+  running: 'Computing both heatmaps…',
+  ready: 'Click to try a different photo',
+  error: 'Something went wrong — click to try again',
+};
 
 export function LiveGradCamPlusPlusPlayground() {
   const [status, setStatus] = useState<Status>('idle');
@@ -62,9 +71,14 @@ export function LiveGradCamPlusPlusPlayground() {
     }
   }, []);
 
+  const isBusy = status === 'loading-engine' || status === 'running';
+
   return (
-    <div className={`${styles.container} clay-panel`}>
-      <h3 className={styles.title}>Try it on your own photo</h3>
+    <div className={`${styles.container} glass-panel`}>
+      <div className={styles.heading}>
+        <Sparkles size={16} strokeWidth={1.8} className={styles.headingIcon} aria-hidden="true" />
+        <h3 className={styles.title}>Try it on your own photo</h3>
+      </div>
       <p className={styles.description}>
         The rows above compare live Grad-CAM against a Grad-CAM++ that was precomputed on Kaggle for
         10 fixed images. This computes{' '}
@@ -75,7 +89,7 @@ export function LiveGradCamPlusPlusPlayground() {
         live playground (cached after first use).
       </p>
 
-      <label className={styles.uploadZone}>
+      <label className={`${styles.uploadZone} ${isBusy ? styles.uploadZoneBusy : ''}`}>
         <input
           type="file"
           accept="image/*"
@@ -85,13 +99,12 @@ export function LiveGradCamPlusPlusPlayground() {
             if (file) void handleFile(file);
           }}
         />
-        <span>
-          {status === 'idle' && 'Click to upload a photo'}
-          {status === 'loading-engine' && 'Downloading the attack engine (43MB, one-time)…'}
-          {status === 'running' && 'Computing both heatmaps…'}
-          {status === 'ready' && 'Click to try a different photo'}
-          {status === 'error' && 'Something went wrong — click to try again'}
-        </span>
+        {status === 'loading-engine' && (
+          <CloudDownload size={18} className={styles.uploadIconAnimated} />
+        )}
+        {status === 'running' && <Loader2 size={18} className={styles.uploadIconSpin} />}
+        {!isBusy && <Upload size={18} strokeWidth={1.8} />}
+        <span>{STATUS_COPY[status]}</span>
       </label>
 
       {errorMessage && <p className={styles.errorText}>{errorMessage}</p>}
@@ -99,11 +112,11 @@ export function LiveGradCamPlusPlusPlayground() {
       <div className={styles.canvasRow}>
         <div className={styles.panel}>
           <canvas ref={gradcamCanvasRef} className={styles.canvas} />
-          <span className={styles.panelLabel}>Grad-CAM (live)</span>
+          <span className={styles.panelLabel}>Grad-CAM · live</span>
         </div>
         <div className={styles.panel}>
           <canvas ref={gradcamPpCanvasRef} className={styles.canvas} />
-          <span className={styles.panelLabel}>Grad-CAM++ (live)</span>
+          <span className={styles.panelLabel}>Grad-CAM++ · live</span>
         </div>
       </div>
 

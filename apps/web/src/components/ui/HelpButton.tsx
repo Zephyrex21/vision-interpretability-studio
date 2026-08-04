@@ -1,3 +1,4 @@
+import { CircleHelp } from 'lucide-react';
 import styles from './HelpButton.module.css';
 
 interface HelpButtonProps {
@@ -12,7 +13,7 @@ export function HelpButton({ onClick }: HelpButtonProps) {
       onClick={onClick}
       aria-label="What is this tool? Show the introduction again"
     >
-      ?
+      <CircleHelp size={18} strokeWidth={1.8} />
     </button>
   );
 }

@@ -4,11 +4,10 @@
   gap: var(--space-6);
 }
 
-.intro {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: var(--fs-sm);
-  max-width: 62ch;
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
 }
 
 .layerGroup {
@@ -17,30 +16,33 @@
   gap: var(--space-3);
   padding: var(--space-4);
   border-radius: var(--radius-md);
-  background: var(--surface-panel);
-  box-shadow: var(--clay-card);
 }
 
 .layerHeader {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: var(--space-3);
   flex-wrap: wrap;
 }
 
-.layerTitle {
-  margin: 0;
+.layerBadge {
+  flex-shrink: 0;
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: var(--fs-base);
+  font-size: var(--fs-sm);
   color: var(--accent-strong);
   text-transform: capitalize;
+  background: var(--surface-raised);
+  border-radius: var(--radius-pill);
+  padding: var(--space-1) var(--space-3);
+  box-shadow: var(--clay-raised-sm);
 }
 
 .layerCaption {
   margin: 0;
   font-size: var(--fs-xs);
   color: var(--text-muted);
+  line-height: 1.5;
 }
 
 .grid {
@@ -73,6 +75,7 @@
 
 .thumb:hover {
   transform: translateY(-2px);
+  box-shadow: var(--clay-raised);
 }
 
 .thumbLabel {
@@ -92,21 +95,19 @@
 .lightboxBackdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 50;
   padding: var(--space-5);
-  backdrop-filter: blur(3px);
+  backdrop-filter: blur(6px);
 }
 
 .lightboxCard {
-  background: var(--surface-panel);
-  border-radius: var(--radius-lg);
   overflow: hidden;
   max-width: min(90vw, 480px);
-  box-shadow: var(--clay-card);
+  border-radius: var(--radius-lg);
 }
 
 .lightboxImage {
@@ -135,8 +136,11 @@
   width: 28px;
   height: 28px;
   color: var(--text-muted);
-  font-size: var(--fs-base);
   cursor: pointer;
-  line-height: 1;
   box-shadow: var(--clay-raised-sm);
+  transition: color var(--duration-fast) var(--ease-standard);
+}
+
+.lightboxMeta button:hover {
+  color: var(--accent-strong);
 }

@@ -11,9 +11,12 @@
 }
 
 .card {
-  background: var(--surface-panel);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
   border-radius: var(--radius-lg);
-  box-shadow: var(--clay-card);
+  box-shadow: var(--glass-shadow);
   max-width: 460px;
   width: 100%;
   padding: var(--space-6);

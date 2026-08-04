@@ -1,6 +1,8 @@
 import { useCallback, useRef, useState } from 'react';
+import { ShieldAlert } from 'lucide-react';
 import adversarialMetadata from '../../data/adversarialMetadata.json';
 import { InfoTip } from '../ui/InfoTip';
+import { SectionHeader } from '../ui/SectionHeader';
 import { LiveFgsmPlayground } from './LiveFgsmPlayground';
 import styles from './AdversarialView.module.css';
 
@@ -70,7 +72,7 @@ function AdversarialCard({ entry }: { entry: AdversarialEntry }) {
   };
 
   return (
-    <div className={styles.card}>
+    <div className={`${styles.card} glass-panel`}>
       <div
         ref={wrapperRef}
         className={styles.sliderWrapper}
@@ -121,26 +123,39 @@ function AdversarialCard({ entry }: { entry: AdversarialEntry }) {
 export function AdversarialView() {
   return (
     <div className={styles.container}>
-      <p className={styles.intro}>
-        Each pair below was generated once, on Kaggle, using the{' '}
-        <InfoTip definition="An algorithm that nudges every pixel slightly in whichever direction most confuses the model — named for using only the sign (+/-) of the gradient, not its size.">
-          Fast Gradient Sign Method
-        </InfoTip>
-        : every pixel nudged by at most{' '}
-        <InfoTip definition="The Greek letter used for the perturbation budget — how far any single pixel is allowed to shift. Smaller epsilon means a smaller, harder-to-notice change.">
-          {`ε = ${EPSILON}`}
-        </InfoTip>{' '}
-        — roughly {(EPSILON * 100).toFixed(0)}% of full brightness — in the direction that most
-        confuses the model. Drag the slider to compare clean vs. adversarial.{' '}
-        <strong>
-          {FLIPPED_COUNT}/{ENTRIES.length}
-        </strong>{' '}
-        predictions flipped, several with over 90%{' '}
-        <InfoTip definition="How sure the model is about its answer, as a percentage. A confident wrong answer here is exactly what makes this attack concerning.">
-          confidence
-        </InfoTip>{' '}
-        in the wrong answer.
-      </p>
+      <SectionHeader
+        icon={ShieldAlert}
+        eyebrow="Robustness"
+        title="How fragile is trust"
+        description={
+          <>
+            Each pair below was generated once, on Kaggle, using the{' '}
+            <InfoTip definition="An algorithm that nudges every pixel slightly in whichever direction most confuses the model — named for using only the sign (+/-) of the gradient, not its size.">
+              Fast Gradient Sign Method
+            </InfoTip>
+            : every pixel nudged by at most{' '}
+            <InfoTip definition="The Greek letter used for the perturbation budget — how far any single pixel is allowed to shift. Smaller epsilon means a smaller, harder-to-notice change.">
+              {`ε = ${EPSILON}`}
+            </InfoTip>{' '}
+            — roughly {(EPSILON * 100).toFixed(0)}% of full brightness — in the direction that most
+            confuses the model. Drag the slider to compare clean vs. adversarial.
+          </>
+        }
+      />
+
+      <div className={`${styles.statRow} glass-panel-strong`}>
+        <div className={styles.statValue}>
+          {FLIPPED_COUNT}
+          <span className={styles.statValueMuted}>/{ENTRIES.length}</span>
+        </div>
+        <div className={styles.statText}>
+          predictions flipped by an imperceptible pixel nudge, several with over 90%{' '}
+          <InfoTip definition="How sure the model is about its answer, as a percentage. A confident wrong answer here is exactly what makes this attack concerning.">
+            confidence
+          </InfoTip>{' '}
+          in the wrong answer.
+        </div>
+      </div>
 
       <div className={styles.grid}>
         {ENTRIES.map((entry) => (

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Layers as LayersIcon } from 'lucide-react';
 import { classifyWithLayerActivations } from '../../lib/onnx/inference';
 import type { StageActivationMap } from '../../lib/onnx/inference';
 import { loadImageElement } from '../../lib/onnx/preprocess';
@@ -8,6 +9,8 @@ import { renderGradCamOverlay } from '../../lib/gradcam/renderOverlay';
 import { SAMPLE_IMAGES, sampleImageUrl } from '../../data/sampleImages';
 import { HeatmapLegend } from '../ui/HeatmapLegend';
 import { InfoTip } from '../ui/InfoTip';
+import { SectionHeader } from '../ui/SectionHeader';
+import { SampleStrip } from '../ui/SampleStrip';
 import styles from './LayersView.module.css';
 
 const STAGE_CAPTIONS: Record<string, string> = {
@@ -69,15 +72,22 @@ export function LayersView() {
 
   return (
     <div className={styles.container}>
-      <p className={styles.intro}>
-        Scrub through network depth to watch where activity concentrates as an image moves through
-        the network — not a class explanation like Grad-CAM, just "where is this layer paying
-        attention." No gradients involved, just the raw{' '}
-        <InfoTip definition="A neuron's output value after seeing the image — how strongly that specific detector fired, at every location in the image.">
-          activation
-        </InfoTip>{' '}
-        magnitudes at each depth.
-      </p>
+      <SectionHeader
+        icon={LayersIcon}
+        eyebrow="Network depth"
+        title="How depth builds meaning"
+        description={
+          <>
+            Scrub through network depth to watch where activity concentrates as an image moves
+            through the network — not a class explanation like Grad-CAM, just "where is this layer
+            paying attention." No gradients involved, just the raw{' '}
+            <InfoTip definition="A neuron's output value after seeing the image — how strongly that specific detector fired, at every location in the image.">
+              activation
+            </InfoTip>{' '}
+            magnitudes at each depth.
+          </>
+        }
+      />
 
       <div className={styles.layout}>
         <div className={styles.canvasWrapper}>
@@ -102,22 +112,15 @@ export function LayersView() {
         </div>
 
         <div className={styles.controls}>
-          <div className={styles.sampleGrid}>
-            {SAMPLE_IMAGES.map((sample) => (
-              <button
-                key={sample.filename}
-                type="button"
-                className={styles.sampleThumb}
-                aria-pressed={sample.filename === activeSample}
-                onClick={() => {
-                  setActiveSample(sample.filename);
-                  void loadAndScrub(sample.filename);
-                }}
-                aria-label={`Use sample image: ${sample.label}`}
-              >
-                <img src={sampleImageUrl(sample.filename)} alt={sample.label} loading="lazy" />
-              </button>
-            ))}
+          <div className={`${styles.controlCard} glass-panel`}>
+            <h3 className={styles.controlTitle}>Sample images</h3>
+            <SampleStrip
+              activeFilename={activeSample}
+              onSelect={(filename) => {
+                setActiveSample(filename);
+                void loadAndScrub(filename);
+              }}
+            />
           </div>
 
           {predictedLabel && status === 'ready' && (
@@ -126,40 +129,43 @@ export function LayersView() {
             </p>
           )}
 
-          <div className={styles.scrubber}>
-            {stages.map((s, idx) => {
-              const isActive = idx === activeStage;
-              return (
-                <button
-                  key={s.label}
-                  type="button"
-                  className={`${styles.stageButton} ${isActive ? styles.stageButtonActive : ''}`}
-                  aria-pressed={isActive}
-                  disabled={status !== 'ready'}
-                  onClick={() => setActiveStage(idx)}
+          <div className={`${styles.controlCard} glass-panel`}>
+            <h3 className={styles.controlTitle}>Depth scrubber</h3>
+            <div className={styles.scrubber}>
+              {stages.map((s, idx) => {
+                const isActive = idx === activeStage;
+                return (
+                  <button
+                    key={s.label}
+                    type="button"
+                    className={`${styles.stageButton} ${isActive ? styles.stageButtonActive : ''}`}
+                    aria-pressed={isActive}
+                    disabled={status !== 'ready'}
+                    onClick={() => setActiveStage(idx)}
+                  >
+                    <span className={styles.stageLabel}>{s.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <AnimatePresence mode="wait">
+              {stage && (
+                <motion.p
+                  key={stage.label}
+                  className={styles.stageCaption}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  <span className={styles.stageLabel}>{s.label}</span>
-                </button>
-              );
-            })}
+                  {STAGE_CAPTIONS[stage.label]}
+                </motion.p>
+              )}
+            </AnimatePresence>
+
+            <HeatmapLegend />
           </div>
-
-          <AnimatePresence mode="wait">
-            {stage && (
-              <motion.p
-                key={stage.label}
-                className={styles.stageCaption}
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.2 }}
-              >
-                {STAGE_CAPTIONS[stage.label]}
-              </motion.p>
-            )}
-          </AnimatePresence>
-
-          <HeatmapLegend />
         </div>
       </div>
     </div>

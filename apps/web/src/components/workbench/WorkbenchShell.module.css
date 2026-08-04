@@ -1,5 +1,6 @@
 .shell {
-  max-width: 1080px;
+  position: relative;
+  max-width: 1120px;
   margin: 0 auto;
   padding: var(--space-7) var(--space-5) var(--space-8);
   display: flex;
@@ -18,6 +19,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  padding-top: var(--space-1);
 }
 
 .headerText {
@@ -39,20 +41,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: var(--surface-raised);
   box-shadow: var(--clay-raised-sm);
+  color: var(--accent);
   flex-shrink: 0;
-}
-
-.orbPupil {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .eyebrow {
@@ -72,23 +67,43 @@
   color: var(--text-primary);
   line-height: 1.15;
   letter-spacing: -0.01em;
+  background: linear-gradient(135deg, var(--text-primary) 55%, var(--accent-strong) 130%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  margin: 0;
+  max-width: 52ch;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
 }
 
 .tabs {
   display: flex;
-  gap: var(--space-3);
-  flex-wrap: wrap;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  overflow-x: auto;
+  border-radius: var(--radius-pill);
+  width: fit-content;
+  max-width: 100%;
 }
 
 /**
- * The signature interaction: an inactive tab is molded clay standing proud
- * of the surface (outset dual-shadow); the active tab looks physically
- * pressed into the surface (inset shadow). Selection state as a real
- * tactile metaphor, not a color swap.
+ * The tab bar is now one continuous glass pill (the `.tabs` container
+ * above) with a single shared "magic move" indicator (`.tabIndicator`,
+ * a framer-motion `layoutId`) that slides and resizes itself to whichever
+ * button is active — one physical object moving between slots, rather
+ * than five independently-styled pressed/unpressed buttons. The clay
+ * pressed/raised language still exists elsewhere (sample thumbnails,
+ * stage scrubber) for controls that are genuinely being toggled
+ * individually; the tab bar reads as a single selector instead.
  */
 .tabButton {
   position: relative;
-  background: var(--surface-raised);
+  background: transparent;
   border: none;
   color: var(--text-secondary);
   border-radius: var(--radius-pill);
@@ -97,27 +112,31 @@
   font-size: var(--fs-sm);
   font-weight: 500;
   cursor: pointer;
-  box-shadow: var(--clay-raised);
-  transition:
-    box-shadow var(--duration-fast) var(--ease-standard),
-    transform var(--duration-fast) var(--ease-standard),
-    color var(--duration-fast) var(--ease-standard);
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color var(--duration-fast) var(--ease-standard);
 }
 
 .tabButton:hover:not(.tabButtonActive) {
-  transform: translateY(-1px);
+  color: var(--text-primary);
 }
 
-.tabButton:active {
-  transform: translateY(1px);
+.tabIndicator {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  box-shadow: var(--clay-pressed), var(--accent-glow);
+  z-index: 0;
 }
 
 .tabButtonActive {
   color: var(--accent-strong);
-  box-shadow: var(--clay-pressed);
 }
 
 .tabContent {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
@@ -139,23 +158,14 @@
 }
 
 .stageCaption {
-  margin: 0 0 var(--space-4);
+  display: inline-block;
+  margin: 0 0 var(--space-5);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--surface-panel);
   color: var(--text-muted);
-  font-size: var(--fs-sm);
-}
-
-.stagePlaceholder {
-  border: 1px dashed var(--surface-panel-border);
-  border-radius: var(--radius-sm);
-  min-height: 160px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-  font-size: var(--fs-sm);
-  text-align: center;
-  padding: var(--space-4);
+  font-size: var(--fs-xs);
+  font-weight: 500;
 }
 
 .tabLoading {
@@ -175,6 +185,10 @@
 
   .title {
     font-size: var(--fs-xl);
+  }
+
+  .tabs {
+    width: 100%;
   }
 }
 

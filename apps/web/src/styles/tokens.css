@@ -1,6 +1,6 @@
 /**
  * Design tokens — Vision Interpretability Studio
- * Claymorphism design system
+ * Claymorphism + glass design system
  *
  * Palette & shadow rationale:
  * - Clay surfaces work by matching a surface's shadow pair to its own
@@ -18,6 +18,14 @@
  * - Heatmap tokens are unchanged — they're functional (colorblind-safe,
  *   legible over either theme), not decorative, so the redesign doesn't
  *   touch them.
+ * - Glass tokens (--glass-*) layer frosted, translucent panels on top of
+ *   the clay language rather than replacing it: a backdrop-blurred,
+ *   semi-transparent surface with a hairline top-edge highlight (the
+ *   classic "light catching frosted glass" cue) sitting above the ambient
+ *   background atmosphere. Clay's raised/pressed shadow pairs still do
+ *   all the tactile/interactive-state work; glass is reserved for resting
+ *   surfaces that should feel like they're floating over depth, not being
+ *   pressed.
  */
 
 :root,
@@ -61,6 +69,22 @@
   --clay-card: 10px 10px 24px rgba(0, 0, 0, 0.45), -8px -8px 20px rgba(255, 255, 255, 0.03);
 
   --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.4);
+
+  /* Glass surfaces */
+  --glass-bg: rgba(38, 40, 55, 0.55);
+  --glass-bg-strong: rgba(31, 32, 41, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.09);
+  --glass-highlight: rgba(255, 255, 255, 0.14);
+  --glass-blur: 20px;
+  --glass-shadow:
+    0 24px 60px -20px rgba(0, 0, 0, 0.65), 0 2px 0 0 var(--glass-highlight) inset,
+    0 -1px 0 0 rgba(0, 0, 0, 0.3) inset;
+  --accent-glow: 0 0 0 1px rgba(155, 140, 255, 0.25), 0 8px 28px -6px rgba(155, 140, 255, 0.45);
+
+  /* Ambient background atmosphere (canvas gradient blobs) */
+  --atmosphere-a: rgba(155, 140, 255, 0.5);
+  --atmosphere-b: rgba(255, 180, 84, 0.32);
+  --atmosphere-c: rgba(139, 63, 191, 0.4);
 }
 
 [data-theme='light'] {
@@ -96,6 +120,21 @@
   --clay-card: 10px 10px 24px rgba(163, 172, 198, 0.45), -8px -8px 20px rgba(255, 255, 255, 0.85);
 
   --shadow-soft: 0 8px 30px rgba(20, 21, 26, 0.1);
+
+  /* Glass surfaces */
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-bg-strong: rgba(255, 255, 255, 0.78);
+  --glass-border: rgba(20, 21, 26, 0.07);
+  --glass-highlight: rgba(255, 255, 255, 0.8);
+  --glass-blur: 20px;
+  --glass-shadow:
+    0 24px 50px -22px rgba(32, 34, 58, 0.28), 0 1px 0 0 var(--glass-highlight) inset,
+    0 -1px 0 0 rgba(20, 21, 26, 0.04) inset;
+  --accent-glow: 0 0 0 1px rgba(108, 92, 255, 0.18), 0 8px 24px -8px rgba(108, 92, 255, 0.35);
+
+  --atmosphere-a: rgba(108, 92, 255, 0.3);
+  --atmosphere-b: rgba(224, 138, 46, 0.2);
+  --atmosphere-c: rgba(139, 63, 191, 0.22);
 }
 
 :root {
@@ -128,7 +167,15 @@
   --radius-sm: 14px;
   --radius-md: 22px;
   --radius-lg: 32px;
+  --radius-xl: 40px;
   --radius-pill: 999px;
+
+  /* Icon sizing, kept to a small fixed scale so lucide-react icons stay
+     visually consistent wherever they appear (nav, section headers,
+     upload zones, stat chips). */
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 28px;
 
   /* Motion */
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);

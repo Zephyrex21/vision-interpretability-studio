@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
+import { CloudDownload, Loader2, Sparkles, Upload } from 'lucide-react';
 import { InfoTip } from '../ui/InfoTip';
 import styles from './LiveFgsmPlayground.module.css';
 
@@ -15,6 +16,14 @@ interface LiveResult {
 }
 
 const EPSILON = 0.03;
+
+const STATUS_COPY: Record<Status, string> = {
+  idle: 'Click to upload a photo',
+  'loading-engine': 'Downloading the attack engine (43MB, one-time)…',
+  running: 'Computing a real gradient-based attack…',
+  ready: 'Click to try a different photo',
+  error: 'Something went wrong — click to try again',
+};
 
 export function LiveFgsmPlayground() {
   const [status, setStatus] = useState<Status>('idle');
@@ -65,9 +74,14 @@ export function LiveFgsmPlayground() {
     }
   }, []);
 
+  const isBusy = status === 'loading-engine' || status === 'running';
+
   return (
-    <div className={`${styles.container} clay-panel`}>
-      <h3 className={styles.title}>Try it on your own photo</h3>
+    <div className={`${styles.container} glass-panel`}>
+      <div className={styles.heading}>
+        <Sparkles size={16} strokeWidth={1.8} className={styles.headingIcon} aria-hidden="true" />
+        <h3 className={styles.title}>Try it on your own photo</h3>
+      </div>
       <p className={styles.description}>
         Everything above uses 10 fixed sample images. This runs a{' '}
         <InfoTip definition="Software that computes gradients — the calculus needed for a real attack — directly in your browser, separate from the faster engine used elsewhere in this app that can only run predictions, not compute attacks.">
@@ -77,7 +91,7 @@ export function LiveFgsmPlayground() {
         loads a second ~43MB file the first time you use it (cached after that).
       </p>
 
-      <label className={styles.uploadZone}>
+      <label className={`${styles.uploadZone} ${isBusy ? styles.uploadZoneBusy : ''}`}>
         <input
           ref={fileInputRef}
           type="file"
@@ -89,12 +103,13 @@ export function LiveFgsmPlayground() {
             if (file) void handleFile(file);
           }}
         />
+        {status === 'loading-engine' && (
+          <CloudDownload size={18} className={styles.uploadIconAnimated} />
+        )}
+        {status === 'running' && <Loader2 size={18} className={styles.uploadIconSpin} />}
+        {!isBusy && <Upload size={18} strokeWidth={1.8} />}
         <span data-testid="fgsm-status" data-status={status}>
-          {status === 'idle' && 'Click to upload a photo'}
-          {status === 'loading-engine' && 'Downloading the attack engine (43MB, one-time)…'}
-          {status === 'running' && 'Computing a real gradient-based attack…'}
-          {status === 'ready' && 'Click to try a different photo'}
-          {status === 'error' && 'Something went wrong — click to try again'}
+          {STATUS_COPY[status]}
         </span>
       </label>
 

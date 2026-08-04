@@ -1,5 +1,13 @@
 import { lazy, Suspense } from 'react';
 import { motion } from 'framer-motion';
+import {
+  Eye,
+  Flame,
+  GitCompare,
+  LayoutGrid,
+  Layers as LayersIcon,
+  ShieldAlert,
+} from 'lucide-react';
 import { useWorkbench } from '../../state/useWorkbench';
 import type { VisualizationTab } from '../../state/WorkbenchContext';
 import { useOnboardingTour } from '../../state/useOnboardingTour';
@@ -28,16 +36,47 @@ const CompareView = lazy(() =>
   import('../visualizations/CompareView').then((m) => ({ default: m.CompareView })),
 );
 
-const TABS: { id: VisualizationTab; label: string; caption: string; status: 'live' | 'soon' }[] = [
-  { id: 'gradcam', label: 'Grad-CAM', caption: 'What drove the decision', status: 'live' },
-  { id: 'layers', label: 'Layers', caption: 'How depth builds meaning', status: 'live' },
-  { id: 'features', label: 'Features', caption: 'What each filter detects', status: 'live' },
-  { id: 'adversarial', label: 'Adversarial', caption: 'How fragile is trust', status: 'live' },
+const TABS: {
+  id: VisualizationTab;
+  label: string;
+  caption: string;
+  status: 'live' | 'soon';
+  icon: typeof Flame;
+}[] = [
+  {
+    id: 'gradcam',
+    label: 'Grad-CAM',
+    caption: 'What drove the decision',
+    status: 'live',
+    icon: Flame,
+  },
+  {
+    id: 'layers',
+    label: 'Layers',
+    caption: 'How depth builds meaning',
+    status: 'live',
+    icon: LayersIcon,
+  },
+  {
+    id: 'features',
+    label: 'Features',
+    caption: 'What each filter detects',
+    status: 'live',
+    icon: LayoutGrid,
+  },
+  {
+    id: 'adversarial',
+    label: 'Adversarial',
+    caption: 'How fragile is trust',
+    status: 'live',
+    icon: ShieldAlert,
+  },
   {
     id: 'compare',
     label: 'Compare',
     caption: 'Live Grad-CAM vs precomputed Grad-CAM++',
     status: 'live',
+    icon: GitCompare,
   },
 ];
 
@@ -54,11 +93,15 @@ export function WorkbenchShell() {
         <div className={styles.headerText}>
           <div className={styles.eyebrowRow}>
             <span className={styles.orb} aria-hidden="true">
-              <span className={styles.orbPupil} />
+              <Eye size={13} strokeWidth={2} />
             </span>
             <p className={styles.eyebrow}>Vision Interpretability Studio</p>
           </div>
           <h1 className={styles.title}>See inside the model, not just its answer</h1>
+          <p className={styles.subtitle}>
+            A ResNet-18 trained from scratch, inspected live in your browser — five ways to watch it
+            think.
+          </p>
         </div>
         <div className={styles.headerActions}>
           <HelpButton onClick={openTour} />
@@ -66,9 +109,13 @@ export function WorkbenchShell() {
         </div>
       </header>
 
-      <nav className={styles.tabs} aria-label="Visualization mode">
+      <nav
+        className={`${styles.tabs} glass-panel-strong thin-scroll`}
+        aria-label="Visualization mode"
+      >
         {TABS.map((tab) => {
           const isActive = tab.id === activeTab;
+          const Icon = tab.icon;
           return (
             <button
               key={tab.id}
@@ -78,7 +125,15 @@ export function WorkbenchShell() {
               aria-pressed={isActive}
               onClick={() => setActiveTab(tab.id)}
             >
+              {isActive && (
+                <motion.span
+                  layoutId="tab-indicator"
+                  className={styles.tabIndicator}
+                  transition={{ type: 'spring', stiffness: 420, damping: 34 }}
+                />
+              )}
               <span className={styles.tabContent}>
+                <Icon size={16} strokeWidth={1.9} aria-hidden="true" />
                 <span className={styles.tabLabel}>{tab.label}</span>
                 {tab.status === 'soon' && <span className={styles.soonBadge}>soon</span>}
               </span>
@@ -87,7 +142,7 @@ export function WorkbenchShell() {
         })}
       </nav>
 
-      <main className={`${styles.stage} clay-panel`}>
+      <main className={`${styles.stage} glass-panel`}>
         <motion.div
           key={active.id}
           initial={{ opacity: 0, y: 8 }}
