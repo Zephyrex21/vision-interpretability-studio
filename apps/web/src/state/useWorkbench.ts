@@ -1,6 +1,6 @@
 import { useContext } from 'react';
-import { WorkbenchContext } from './workbenchContext';
-import type { WorkbenchState } from './workbenchContext';
+import { WorkbenchContext } from './workbench-context';
+import type { WorkbenchState } from './workbench-context';
 
 export function useWorkbench(): WorkbenchState {
   const ctx = useContext(WorkbenchContext);

@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { ThemeContext } from './themeContext';
-import type { Theme, ThemeContextValue } from './themeContext';
+import { ThemeContext } from './theme-context';
+import type { Theme, ThemeContextValue } from './theme-context';
 
-export type { Theme, ThemeContextValue } from './themeContext';
+export type { Theme, ThemeContextValue } from './theme-context';
 
 const STORAGE_KEY = 'vis-studio-theme';
 

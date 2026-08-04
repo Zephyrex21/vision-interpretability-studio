@@ -1,3 +1,6 @@
 dist
 node_modules
 public
+test-results
+playwright-report
+blob-report

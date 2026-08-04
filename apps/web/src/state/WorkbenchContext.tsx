@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { WorkbenchContext } from './workbenchContext';
-import type { VisualizationTab, WorkbenchState } from './workbenchContext';
+import { WorkbenchContext } from './workbench-context';
+import type { VisualizationTab, WorkbenchState } from './workbench-context';
 
-export type { VisualizationTab, WorkbenchState } from './workbenchContext';
+export type { VisualizationTab, WorkbenchState } from './workbench-context';
 
 /**
  * Shared workbench state — the single source of truth every visualization
