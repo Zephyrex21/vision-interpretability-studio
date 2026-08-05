@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 /**
  * Regression test for the mobile-pass bug the README describes: the
@@ -77,7 +77,16 @@ test('the reveal slider responds to touch pointer events, not just mouse', async
   expect(afterReleaseLeft).toBe(draggedLeft);
 });
 
-test('touch targets on the tab bar meet the 44px minimum', async ({ page }) => {
+test('touch targets on the tab bar meet the 44px minimum', async ({ page }, testInfo) => {
+  // The 44px bump is a `@media (hover: none) and (pointer: coarse)` rule —
+  // deliberately touch-only, so desktop Chrome (mouse pointer) is expected
+  // to stay compact and legitimately fails this assertion. Only meaningful
+  // on the touch-emulated project.
+  test.skip(
+    testInfo.project.name !== 'mobile-chromium',
+    'touch target sizing only applies on pointer: coarse devices',
+  );
+
   await page.goto('/');
   const tab = page.getByTestId('tab-adversarial');
   const box = await tab.boundingBox();
