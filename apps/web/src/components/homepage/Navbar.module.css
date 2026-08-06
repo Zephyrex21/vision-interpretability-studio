@@ -114,6 +114,10 @@
   transform: translateY(-1px);
 }
 
+.cta:active {
+  transform: translateY(0) scale(0.96);
+}
+
 .menuButton {
   display: none;
   align-items: center;

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Boxes, Code2, Cpu, Percent } from 'lucide-react';
+import { NetworkDiagram } from './NetworkDiagram';
 import styles from './Hero.module.css';
 
 const GITHUB_URL = 'https://github.com/Zephyrex21/vision-interpretability-studio';
@@ -71,39 +72,35 @@ export function Hero() {
             </a>
           </motion.div>
 
-          <motion.dl
-            className={styles.stats}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.25 }}
-          >
-            {STATS.map((stat) => (
-              <div key={stat.label} className={styles.stat} title={stat.title}>
+          <dl className={styles.stats}>
+            {STATS.map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                className={styles.stat}
+                title={stat.title}
+                initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 18, delay: 0.3 + i * 0.08 }}
+              >
                 <stat.icon size={14} strokeWidth={2} className={styles.statIcon} />
                 <dd className={styles.statLabel}>{stat.label}</dd>
-              </div>
+              </motion.div>
             ))}
-          </motion.dl>
+          </dl>
         </div>
 
         <motion.div
           className={styles.visual}
-          initial={{ opacity: 0, scale: 0.96 }}
+          initial={{ opacity: 0, scale: 0.94 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
-          <div className={`${styles.visualCard} glass-panel`}>
-            <img
-              src="/samples/sample_00_chain_saw.jpg"
-              alt=""
-              className={styles.visualImage}
-              aria-hidden="true"
-            />
-            <div className={styles.heatOverlay} aria-hidden="true" />
-            <span className={styles.visualChip}>Grad-CAM · chain saw</span>
+          <div className={styles.visualCard}>
+            <NetworkDiagram />
+            <span className={styles.visualChip}>ResNet-18 · trained from scratch</span>
           </div>
           <span className={styles.visualCaption}>
-            An illustration of the Grad-CAM tab — try it live with your own photo
+            An illustration of the network — inspect the real one live
           </span>
         </motion.div>
       </div>

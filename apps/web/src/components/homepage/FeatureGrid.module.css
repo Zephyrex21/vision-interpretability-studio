@@ -35,43 +35,93 @@
 }
 
 .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: var(--space-4);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-5);
 }
 
+.gridItem {
+  flex: 1 1 260px;
+  max-width: 320px;
+}
+
+.tiltWrapper {
+  height: 100%;
+}
+
+/**
+ * Real claymorphism, not a flat panel: a pillowy, deeply-shadowed surface
+ * molded from the same material as its background. The pressed inset
+ * highlight ring on hover is the same physical-selection metaphor the
+ * tab bar uses elsewhere — it reads as "this card is being lifted
+ * toward you," not just a color change.
+ */
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-3);
   height: 100%;
   padding: var(--space-5);
+  border-radius: var(--radius-xl);
+  background: var(--surface-raised);
+  box-shadow: var(--clay-raised);
   text-decoration: none;
   color: inherit;
-  transition:
-    transform var(--duration-fast) var(--ease-standard),
-    box-shadow var(--duration-fast) var(--ease-standard);
+  overflow: hidden;
+  transform: translateZ(0);
+  transition: box-shadow var(--duration-base) var(--ease-standard);
+}
+
+/* Cursor-following glow, position driven by TiltCard's --glow-x/--glow-y
+   motion values. Pure decoration, ignored entirely by prefers-reduced-motion
+   users since it only ever appears on active pointer hover. */
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--glow-x, 50%) var(--glow-y, 50%),
+    var(--accent-soft),
+    transparent 62%
+  );
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-standard);
+  pointer-events: none;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--glass-shadow), var(--accent-glow);
+  box-shadow: var(--clay-raised), var(--accent-glow);
+}
+
+.card:hover::before {
+  opacity: 1;
 }
 
 .iconChip {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: var(--radius-md);
-  background: var(--surface-raised);
+  background: var(--surface-panel);
   color: var(--accent-strong);
-  box-shadow: var(--clay-raised-sm);
+  box-shadow: var(--clay-pressed);
+  transition: transform var(--duration-base) var(--ease-clay);
+}
+
+.card:hover .iconChip {
+  transform: translateY(-3px) rotate(-6deg) scale(1.08);
 }
 
 .cardTitle {
+  position: relative;
+  z-index: 1;
   margin: 0;
   font-family: var(--font-display);
   font-size: var(--fs-lg);
@@ -80,6 +130,8 @@
 }
 
 .cardDescription {
+  position: relative;
+  z-index: 1;
   margin: 0;
   flex-grow: 1;
   color: var(--text-secondary);
@@ -88,10 +140,17 @@
 }
 
 .cardLink {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
   color: var(--accent-strong);
   font-size: var(--fs-xs);
   font-weight: 600;
+  transition: gap var(--duration-fast) var(--ease-standard);
+}
+
+.card:hover .cardLink {
+  gap: var(--space-2);
 }

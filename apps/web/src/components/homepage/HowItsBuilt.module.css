@@ -33,27 +33,69 @@
   gap: var(--space-4);
 }
 
+.tiltWrapper {
+  height: 100%;
+}
+
 .card {
+  position: relative;
   display: flex;
   align-items: flex-start;
   gap: var(--space-4);
+  height: 100%;
   padding: var(--space-5);
+  border-radius: var(--radius-xl);
+  background: var(--surface-raised);
+  box-shadow: var(--clay-raised);
+  overflow: hidden;
+  transition: box-shadow var(--duration-base) var(--ease-standard);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--glow-x, 50%) var(--glow-y, 50%),
+    var(--accent-soft),
+    transparent 62%
+  );
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-standard);
+  pointer-events: none;
+}
+
+.card:hover {
+  box-shadow: var(--clay-raised), var(--accent-glow);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.card:hover .iconChip {
+  transform: translateY(-3px) rotate(-6deg) scale(1.08);
 }
 
 .iconChip {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--radius-md);
-  background: var(--surface-raised);
+  background: var(--surface-panel);
   color: var(--accent-strong);
-  box-shadow: var(--clay-raised-sm);
+  box-shadow: var(--clay-pressed);
+  transition: transform var(--duration-base) var(--ease-clay);
 }
 
 .cardTitle {
+  position: relative;
+  z-index: 1;
   margin: 0 0 var(--space-2);
   font-family: var(--font-display);
   font-size: var(--fs-lg);
@@ -62,6 +104,8 @@
 }
 
 .cardDescription {
+  position: relative;
+  z-index: 1;
   margin: 0;
   color: var(--text-secondary);
   font-size: var(--fs-sm);

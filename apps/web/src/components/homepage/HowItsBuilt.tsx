@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { CheckCircle2, Lock, Puzzle, Sparkles } from 'lucide-react';
+import { TiltCard } from '../ui/TiltCard';
 import styles from './HowItsBuilt.module.css';
 
 const HIGHLIGHTS = [
@@ -41,19 +42,23 @@ export function HowItsBuilt() {
         {HIGHLIGHTS.map((item, i) => (
           <motion.div
             key={item.title}
-            className={`${styles.card} glass-panel`}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            style={{ perspective: '1000px' }}
+            initial={{ opacity: 0, y: 40, scale: 0.92 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.4, delay: i * 0.06 }}
+            transition={{ type: 'spring', stiffness: 210, damping: 20, delay: i * 0.08 }}
           >
-            <span className={styles.iconChip} aria-hidden="true">
-              <item.icon size={18} strokeWidth={1.8} />
-            </span>
-            <div>
-              <h3 className={styles.cardTitle}>{item.title}</h3>
-              <p className={styles.cardDescription}>{item.description}</p>
-            </div>
+            <TiltCard strength={4} className={styles.tiltWrapper}>
+              <div className={styles.card}>
+                <span className={styles.iconChip} aria-hidden="true">
+                  <item.icon size={18} strokeWidth={1.8} />
+                </span>
+                <div>
+                  <h3 className={styles.cardTitle}>{item.title}</h3>
+                  <p className={styles.cardDescription}>{item.description}</p>
+                </div>
+              </div>
+            </TiltCard>
           </motion.div>
         ))}
       </div>

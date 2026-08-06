@@ -4,28 +4,64 @@
   padding: var(--space-5) var(--space-5) var(--space-8);
 }
 
+.tiltWrapper {
+  display: block;
+}
+
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   gap: var(--space-3);
   padding: var(--space-8) var(--space-5);
+  border-radius: var(--radius-xl);
+  background: var(--surface-raised);
+  box-shadow: var(--clay-raised);
+  overflow: hidden;
+  transition: box-shadow var(--duration-base) var(--ease-standard);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--glow-x, 50%) var(--glow-y, 50%),
+    var(--accent-soft),
+    transparent 65%
+  );
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-standard);
+  pointer-events: none;
+}
+
+.card:hover {
+  box-shadow: var(--clay-raised), var(--accent-glow);
+}
+
+.card:hover::before {
+  opacity: 1;
 }
 
 .iconChip {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: var(--surface-raised);
+  background: var(--surface-panel);
   color: var(--accent);
-  box-shadow: var(--clay-raised);
+  box-shadow: var(--clay-pressed);
 }
 
 .title {
+  position: relative;
+  z-index: 1;
   margin: 0;
   font-family: var(--font-display);
   font-size: var(--fs-2xl);
@@ -36,6 +72,8 @@
 }
 
 .description {
+  position: relative;
+  z-index: 1;
   margin: 0;
   max-width: 46ch;
   color: var(--text-secondary);
@@ -44,6 +82,8 @@
 }
 
 .cta {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
@@ -56,9 +96,15 @@
   font-size: var(--fs-sm);
   text-decoration: none;
   box-shadow: var(--accent-glow);
-  transition: transform var(--duration-fast) var(--ease-standard);
+  transition:
+    transform var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard);
 }
 
 .cta:hover {
   transform: translateY(-2px);
+}
+
+.cta:active {
+  transform: translateY(0) scale(0.97);
 }

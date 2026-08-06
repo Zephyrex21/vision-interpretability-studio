@@ -8,6 +8,7 @@ import {
   Layers as LayersIcon,
   ShieldAlert,
 } from 'lucide-react';
+import { TiltCard } from '../ui/TiltCard';
 import styles from './FeatureGrid.module.css';
 
 const FEATURES = [
@@ -64,22 +65,26 @@ export function FeatureGrid() {
         {FEATURES.map((feature, i) => (
           <motion.div
             key={feature.tab}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.4, delay: i * 0.06 }}
+            className={styles.gridItem}
+            style={{ perspective: '1000px' }}
+            initial={{ opacity: 0, y: 44, scale: 0.9 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ type: 'spring', stiffness: 210, damping: 20, delay: i * 0.08 }}
           >
-            <Link to={`/app?tab=${feature.tab}`} className={`${styles.card} glass-panel`}>
-              <span className={styles.iconChip} aria-hidden="true">
-                <feature.icon size={20} strokeWidth={1.75} />
-              </span>
-              <h3 className={styles.cardTitle}>{feature.title}</h3>
-              <p className={styles.cardDescription}>{feature.description}</p>
-              <span className={styles.cardLink}>
-                Try it
-                <ArrowRight size={14} strokeWidth={2} />
-              </span>
-            </Link>
+            <TiltCard className={styles.tiltWrapper}>
+              <Link to={`/app?tab=${feature.tab}`} className={styles.card}>
+                <span className={styles.iconChip} aria-hidden="true">
+                  <feature.icon size={20} strokeWidth={1.75} />
+                </span>
+                <h3 className={styles.cardTitle}>{feature.title}</h3>
+                <p className={styles.cardDescription}>{feature.description}</p>
+                <span className={styles.cardLink}>
+                  Try it
+                  <ArrowRight size={14} strokeWidth={2} />
+                </span>
+              </Link>
+            </TiltCard>
           </motion.div>
         ))}
       </div>

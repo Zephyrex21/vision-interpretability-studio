@@ -104,6 +104,10 @@
   transform: translateY(-2px);
 }
 
+.primaryCta:active {
+  transform: translateY(0) scale(0.97);
+}
+
 .secondaryCta {
   display: inline-flex;
   align-items: center;
@@ -125,6 +129,10 @@
   transform: translateY(-2px);
 }
 
+.secondaryCta:active {
+  transform: translateY(0) scale(0.97);
+}
+
 .stats {
   display: flex;
   flex-wrap: wrap;
@@ -139,6 +147,7 @@
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-pill);
   background: var(--surface-panel);
+  box-shadow: var(--clay-pressed);
 }
 
 .statIcon {
@@ -161,63 +170,34 @@
 
 .visualCard {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
   width: 100%;
   max-width: 340px;
   aspect-ratio: 1;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
+  padding: var(--space-5);
+  border-radius: var(--radius-xl);
+  background: var(--surface-raised);
+  box-shadow: var(--clay-raised);
 }
 
-.visualImage {
+.visualCard svg {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  filter: saturate(0.9);
-}
-
-.heatOverlay {
-  position: absolute;
-  inset: 0;
-  mix-blend-mode: hard-light;
-  opacity: 0.75;
-  background-image: radial-gradient(
-    circle,
-    var(--heat-high) 0%,
-    var(--heat-mid) 32%,
-    var(--heat-low) 60%,
-    transparent 78%
-  );
-  background-size: 150% 150%;
-  background-position: 65% 40%;
-  animation: heroHeatDrift 7s ease-in-out infinite;
-}
-
-@keyframes heroHeatDrift {
-  0%,
-  100% {
-    background-position: 65% 40%;
-    opacity: 0.7;
-  }
-  50% {
-    background-position: 58% 32%;
-    opacity: 0.85;
-  }
+  height: auto;
+  max-height: 78%;
 }
 
 .visualChip {
-  position: absolute;
-  left: var(--space-3);
-  bottom: var(--space-3);
-  padding: 5px 12px;
+  padding: 6px 14px;
   border-radius: var(--radius-pill);
-  background: rgba(0, 0, 0, 0.55);
-  color: #fff;
+  background: var(--surface-panel);
+  box-shadow: var(--clay-pressed);
+  color: var(--text-secondary);
   font-size: var(--fs-xs);
   font-weight: 600;
-  text-transform: capitalize;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
 }
 
 .visualCaption {
