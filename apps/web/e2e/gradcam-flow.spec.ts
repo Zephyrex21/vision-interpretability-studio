@@ -17,7 +17,7 @@ test('loads, downloads the model, runs live inference, and renders a heatmap wit
   });
   page.on('pageerror', (err) => consoleErrors.push(err.message));
 
-  await page.goto('/');
+  await page.goto('/app');
 
   // The Grad-CAM tab is the default and auto-runs inference on the first
   // sample image on mount — no click needed to kick off the flow.
@@ -56,7 +56,7 @@ test('loads, downloads the model, runs live inference, and renders a heatmap wit
 });
 
 test('switching samples re-runs inference without re-downloading the model', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/app');
   await expect(page.getByTestId('gradcam-result')).toBeVisible({ timeout: 90_000 });
 
   // Model is now cached in this page's session. Selecting a different

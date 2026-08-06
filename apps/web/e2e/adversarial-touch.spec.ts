@@ -15,7 +15,7 @@ import { test, expect } from './fixtures';
  * `mobile-chromium` project (see playwright.config.ts).
  */
 test('the reveal slider responds to touch pointer events, not just mouse', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/app');
   await page.getByTestId('tab-adversarial').click();
 
   const slider = page.getByTestId('adversarial-slider-0');
@@ -87,7 +87,7 @@ test('touch targets on the tab bar meet the 44px minimum', async ({ page }, test
     'touch target sizing only applies on pointer: coarse devices',
   );
 
-  await page.goto('/');
+  await page.goto('/app');
   const tab = page.getByTestId('tab-adversarial');
   const box = await tab.boundingBox();
   if (!box) throw new Error('Tab has no bounding box');

@@ -1,15 +1,28 @@
+import { lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './state/ThemeContext';
-import { WorkbenchProvider } from './state/WorkbenchContext';
-import { WorkbenchShell } from './components/workbench/WorkbenchShell';
 import { BackgroundAtmosphere } from './components/ui/BackgroundAtmosphere';
+
+// Lazy-loaded per route so a homepage visitor never downloads the Studio's
+// code (or vice versa) — same code-splitting philosophy already used for
+// the individual visualization tabs.
+const HomePage = lazy(() => import('./pages/HomePage').then((m) => ({ default: m.HomePage })));
+const StudioPage = lazy(() =>
+  import('./pages/StudioPage').then((m) => ({ default: m.StudioPage })),
+);
 
 function App() {
   return (
     <ThemeProvider>
-      <WorkbenchProvider>
-        <BackgroundAtmosphere />
-        <WorkbenchShell />
-      </WorkbenchProvider>
+      <BackgroundAtmosphere />
+      <BrowserRouter>
+        <Suspense fallback={null}>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/app" element={<StudioPage />} />
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
     </ThemeProvider>
   );
 }

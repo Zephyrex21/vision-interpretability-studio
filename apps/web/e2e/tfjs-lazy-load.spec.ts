@@ -30,7 +30,7 @@ test('opening the Adversarial tab and browsing the gallery never fetches the TF.
     }
   });
 
-  await page.goto('/');
+  await page.goto('/app');
   await page.getByTestId('tab-adversarial').click();
 
   // Confirm the precomputed gallery actually rendered (i.e. this isn't
@@ -57,7 +57,7 @@ test('uploading a photo to the live FGSM playground does fetch the TF.js engine 
     }
   });
 
-  await page.goto('/');
+  await page.goto('/app');
   await page.getByTestId('tab-adversarial').click();
   await expect(page.getByTestId('adversarial-slider-0')).toBeVisible();
 

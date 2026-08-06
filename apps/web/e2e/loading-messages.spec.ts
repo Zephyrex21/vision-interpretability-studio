@@ -19,7 +19,7 @@ import { test, expect } from './fixtures';
 test('the download message appears on first load and never reappears for a cached session', async ({
   page,
 }) => {
-  await page.goto('/');
+  await page.goto('/app');
 
   // First load on the default Grad-CAM tab: must be the download variant.
   const overlay = page.getByTestId('model-loading-overlay');
