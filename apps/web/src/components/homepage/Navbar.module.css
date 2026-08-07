@@ -45,6 +45,19 @@
   background: var(--surface-raised);
   box-shadow: var(--clay-raised-sm);
   color: var(--accent);
+  animation: brandBreathe 3.4s ease-in-out infinite;
+}
+
+@keyframes brandBreathe {
+  0%,
+  100% {
+    box-shadow: var(--clay-raised-sm);
+  }
+  50% {
+    box-shadow:
+      var(--clay-raised-sm),
+      0 0 8px 1px var(--accent-soft);
+  }
 }
 
 .brandName {
@@ -60,11 +73,30 @@
 }
 
 .link {
+  position: relative;
   color: var(--text-secondary);
   text-decoration: none;
   font-size: var(--fs-sm);
   font-weight: 500;
   transition: color var(--duration-fast) var(--ease-standard);
+}
+
+.link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 1.5px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform var(--duration-base) var(--ease-standard);
+}
+
+.link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
 }
 
 .link:hover {

@@ -33,10 +33,26 @@ const HIGHLIGHTS = [
 export function HowItsBuilt() {
   return (
     <section id="how-it-works" className={styles.section}>
-      <div className={styles.intro}>
-        <p className={styles.eyebrow}>Under the hood</p>
-        <h2 className={styles.title}>Built to be inspected, not just used</h2>
-      </div>
+      <motion.div
+        className={styles.intro}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-60px' }}
+        variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
+      >
+        <motion.p
+          className={styles.eyebrow}
+          variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
+        >
+          Under the hood
+        </motion.p>
+        <motion.h2
+          className={styles.title}
+          variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
+        >
+          Built to be inspected, not just used
+        </motion.h2>
+      </motion.div>
 
       <div className={styles.grid}>
         {HIGHLIGHTS.map((item, i) => (

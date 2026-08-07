@@ -1,12 +1,14 @@
 .section {
   max-width: 1120px;
   margin: 0 auto;
-  padding: var(--space-6) var(--space-5) var(--space-7);
+  padding: var(--space-6) 0 var(--space-7);
   text-align: center;
+  overflow: hidden;
 }
 
 .eyebrow {
   margin: 0 0 var(--space-4);
+  padding: 0 var(--space-5);
   font-size: var(--fs-xs);
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -14,15 +16,35 @@
   color: var(--text-muted);
 }
 
-.row {
+.viewport {
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+}
+
+.track {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  width: max-content;
   gap: var(--space-3);
+  animation: techMarquee 26s linear infinite;
+}
+
+.track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes techMarquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 .badge {
   display: inline-block;
+  flex-shrink: 0;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-pill);
   background: var(--surface-panel);
@@ -31,4 +53,12 @@
   font-size: var(--fs-xs);
   font-weight: 600;
   cursor: default;
+  transition:
+    color var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
+}
+
+.badge:hover {
+  color: var(--accent-strong);
+  transform: translateY(-2px);
 }

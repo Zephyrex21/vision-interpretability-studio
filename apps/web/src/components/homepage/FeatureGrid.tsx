@@ -52,14 +52,33 @@ const FEATURES = [
 export function FeatureGrid() {
   return (
     <section id="features" className={styles.section}>
-      <div className={styles.intro}>
-        <p className={styles.eyebrow}>Five ways to see inside</p>
-        <h2 className={styles.title}>Every angle the model has to offer</h2>
-        <p className={styles.description}>
+      <motion.div
+        className={styles.intro}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-60px' }}
+        variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
+      >
+        <motion.p
+          className={styles.eyebrow}
+          variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
+        >
+          Five ways to see inside
+        </motion.p>
+        <motion.h2
+          className={styles.title}
+          variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
+        >
+          Every angle the model has to offer
+        </motion.h2>
+        <motion.p
+          className={styles.description}
+          variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
+        >
           Each tab is a different lens on the same trained network — pick one below to jump straight
           in.
-        </p>
-      </div>
+        </motion.p>
+      </motion.div>
 
       <div className={styles.grid}>
         {FEATURES.map((feature, i) => (
