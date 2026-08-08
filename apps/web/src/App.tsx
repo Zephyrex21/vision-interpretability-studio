@@ -10,6 +10,9 @@ const HomePage = lazy(() => import('./pages/HomePage').then((m) => ({ default: m
 const StudioPage = lazy(() =>
   import('./pages/StudioPage').then((m) => ({ default: m.StudioPage })),
 );
+const NotFoundPage = lazy(() =>
+  import('./pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
+);
 
 function App() {
   return (
@@ -20,6 +23,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/app" element={<StudioPage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Suspense>
       </BrowserRouter>

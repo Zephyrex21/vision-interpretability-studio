@@ -12,7 +12,8 @@ the stack.
 > real image's activation energy shift from edges to whole-object concepts,
 > computed fresh in the browser), Features (browsable filter gallery),
 > Adversarial (precomputed FGSM comparison gallery), and Compare (live
-> Grad-CAM next to precomputed Grad-CAM++). Deployed, mobile-tested,
+> Grad-CAM next to precomputed Grad-CAM++). A marketing homepage now lives
+> at `/`, with the tool itself at `/app`. Deployed, mobile-tested,
 > claymorphism redesign, first-visit onboarding tour. See
 > [`CASE_STUDY.md`](./CASE_STUDY.md) for the full write-up — the
 > inference-only ONNX constraint, the CAM-equivalence trick that made exact
@@ -46,11 +47,16 @@ vision-interpretability-studio/
 │       │   ├── models/             # model_gradcam.onnx, feature_viz/ images (fetched at runtime)
 │       │   └── samples/            # 10 demo images from the Kaggle validation set
 │       ├── src/
+│       │   ├── pages/                # HomePage (marketing site, at /) and
+│       │   │                         # StudioPage (the tool, at /app) — react-router-dom
 │       │   ├── components/
-│       │   │   ├── workbench/       # layout shell, tab navigation
+│       │   │   ├── homepage/        # Navbar, Hero, FeatureGrid, HowItsBuilt,
+│       │   │   │                    # TechStack, FinalCta, Footer, NetworkDiagram
+│       │   │   ├── workbench/       # tool layout shell, tab navigation
 │       │   │   ├── visualizations/  # GradCamView, LayersView, FeatureVizView,
 │       │   │   │                    # AdversarialView, CompareView
-│       │   │   └── ui/              # shared primitives (ThemeToggle, etc.)
+│       │   │   └── ui/              # shared primitives (ThemeToggle, TiltCard,
+│       │   │                        # AnimatedCounter, BackgroundAtmosphere, etc.)
 │       │   ├── lib/
 │       │   │   ├── onnx/            # session setup, preprocessing, classify + exact Grad-CAM
 │       │   │   └── gradcam/         # canvas heatmap rendering (bilinear upsample + color scale)
@@ -60,6 +66,7 @@ vision-interpretability-studio/
 │       │   ├── styles/               # design tokens (tokens.css), global.css
 │       │   └── test/                 # Vitest setup
 │       ├── e2e/                      # Playwright specs — real browser, real model/weight files
+│       ├── vercel.json                # SPA rewrite so /app doesn't 404 on refresh
 │       └── playwright.config.ts
 ├── ml/
 │   ├── notebooks/
@@ -129,12 +136,14 @@ npm install
 npm run dev
 ```
 
-Open the printed local URL. The Grad-CAM tab loads a sample image and runs
-real inference automatically — you should see a prediction with a confidence
-percentage and a heatmap overlay within a couple of seconds (first load
-downloads the ~43MB model + ~13MB WASM runtime; both are cached by the
-browser afterward). Try uploading your own photo, or use "see attention for
-a different class" to view a counterfactual heatmap.
+Open the printed local URL — that's the homepage. Click **Launch Studio**,
+or go straight to `/app`, to reach the actual tool. The Grad-CAM tab loads a
+sample image and runs real inference automatically — you should see a
+prediction with a confidence percentage and a heatmap overlay within a
+couple of seconds (first load downloads the ~43MB model + ~13MB WASM
+runtime; both are cached by the browser afterward). Try uploading your own
+photo, or use "see attention for a different class" to view a counterfactual
+heatmap.
 
 ## Testing steps
 
