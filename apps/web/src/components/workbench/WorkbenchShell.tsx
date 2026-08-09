@@ -6,6 +6,7 @@ import {
   GitCompare,
   LayoutGrid,
   Layers as LayersIcon,
+  ScanSearch,
   ShieldAlert,
 } from 'lucide-react';
 import { useWorkbench } from '../../state/useWorkbench';
@@ -18,8 +19,8 @@ import styles from './WorkbenchShell.module.css';
 
 // Lazy-loaded per tab so a visitor who only opens, say, the Features tab
 // never downloads onnxruntime-web's JS wrapper (~500KB) at all — that code
-// only lives in the Grad-CAM, Layers, and Compare chunks, the only tabs
-// that actually run model inference.
+// only lives in the Grad-CAM, Layers, Compare, and Occlusion chunks, the
+// only tabs that actually run model inference.
 const GradCamView = lazy(() =>
   import('../visualizations/GradCamView').then((m) => ({ default: m.GradCamView })),
 );
@@ -34,6 +35,9 @@ const AdversarialView = lazy(() =>
 );
 const CompareView = lazy(() =>
   import('../visualizations/CompareView').then((m) => ({ default: m.CompareView })),
+);
+const OcclusionView = lazy(() =>
+  import('../visualizations/OcclusionView').then((m) => ({ default: m.OcclusionView })),
 );
 
 const TABS: {
@@ -78,6 +82,13 @@ const TABS: {
     status: 'live',
     icon: GitCompare,
   },
+  {
+    id: 'occlusion',
+    label: 'Occlusion',
+    caption: 'What matters with no gradients at all',
+    status: 'live',
+    icon: ScanSearch,
+  },
 ];
 
 export function WorkbenchShell() {
@@ -99,7 +110,7 @@ export function WorkbenchShell() {
           </div>
           <h1 className={styles.title}>See inside the model, not just its answer</h1>
           <p className={styles.subtitle}>
-            A ResNet-18 trained from scratch, inspected live in your browser — five ways to watch it
+            A ResNet-18 trained from scratch, inspected live in your browser — six ways to watch it
             think.
           </p>
         </div>
@@ -157,6 +168,7 @@ export function WorkbenchShell() {
             {active.id === 'features' && <FeatureVizView />}
             {active.id === 'adversarial' && <AdversarialView />}
             {active.id === 'compare' && <CompareView />}
+            {active.id === 'occlusion' && <OcclusionView />}
           </Suspense>
         </motion.div>
       </main>

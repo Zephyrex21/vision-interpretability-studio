@@ -8,6 +8,7 @@ const HIGHLIGHTS = [
   { label: 'Features', blurb: 'Browse what individual filters have learned to detect.' },
   { label: 'Adversarial', blurb: 'A barely-visible pixel nudge that flips a confident answer.' },
   { label: 'Compare', blurb: 'Live Grad-CAM next to a precomputed Grad-CAM++ result.' },
+  { label: 'Occlusion', blurb: 'Slide a blind spot across the image — no gradients needed.' },
 ];
 
 interface OnboardingTourProps {

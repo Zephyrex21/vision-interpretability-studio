@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { __internal } from './inference';
 
-const { computeCAM, computeEnergyMap, softmax } = __internal;
+const { computeCAM, computeEnergyMap, computeOcclusionMap, softmax } = __internal;
 
 describe('softmax', () => {
   it('produces probabilities that sum to 1', () => {
@@ -120,5 +120,51 @@ describe('computeEnergyMap', () => {
     const activations = new Float32Array(64 * 1600); // all zeros, 40x40
     const result = computeEnergyMap(activations, [1, 64, 40, 40]);
     expect(result.energy.every((v) => Number.isFinite(v))).toBe(true);
+  });
+});
+
+describe('computeOcclusionMap', () => {
+  it('gives the most damaging patch a normalized value of exactly 1', () => {
+    const baseConfidence = 0.9;
+    // Occluding patch 2 hurt confidence the most (0.9 -> 0.1, a 0.8 drop).
+    const occludedConfidences = [0.85, 0.6, 0.1, 0.88];
+    const result = computeOcclusionMap(baseConfidence, occludedConfidences);
+    expect(result[2]).toBeCloseTo(1, 6);
+    expect(Math.max(...result)).toBeCloseTo(1, 6);
+  });
+
+  it('never produces a negative value when occlusion increases confidence', () => {
+    // A patch that was actively hurting the original prediction (e.g. a
+    // distracting background object) can make confidence go UP when
+    // covered. That's a real, valid outcome — but it must clamp to 0
+    // "importance," not go negative, since a heatmap has no meaningful
+    // way to render "this patch was actively bad for the answer."
+    const baseConfidence = 0.5;
+    const occludedConfidences = [0.9, 0.5, 0.2];
+    const result = computeOcclusionMap(baseConfidence, occludedConfidences);
+    expect(result[0]).toBe(0);
+    expect(result.every((v) => v >= 0)).toBe(true);
+  });
+
+  it('produces an all-zero map when no occlusion changes confidence at all', () => {
+    const baseConfidence = 0.7;
+    const occludedConfidences = [0.7, 0.7, 0.7, 0.7];
+    const result = computeOcclusionMap(baseConfidence, occludedConfidences);
+    expect(result.every((v) => v === 0)).toBe(true);
+  });
+
+  it('preserves relative ordering between two genuinely different drops', () => {
+    const baseConfidence = 1.0;
+    const occludedConfidences = [0.9, 0.5]; // drops of 0.1 and 0.5
+    const result = computeOcclusionMap(baseConfidence, occludedConfidences);
+    expect(result[1]).toBeGreaterThan(result[0]);
+  });
+
+  it('never produces NaN across a realistic 8x8 grid', () => {
+    const baseConfidence = 0.82;
+    const occludedConfidences = Array.from({ length: 64 }, () => Math.random());
+    const result = computeOcclusionMap(baseConfidence, occludedConfidences);
+    expect(result.length).toBe(64);
+    expect(result.every((v) => Number.isFinite(v))).toBe(true);
   });
 });

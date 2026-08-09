@@ -1,6 +1,7 @@
 import { createContext } from 'react';
 
-export type VisualizationTab = 'gradcam' | 'layers' | 'features' | 'adversarial' | 'compare';
+export type VisualizationTab =
+  'gradcam' | 'layers' | 'features' | 'adversarial' | 'compare' | 'occlusion';
 
 export interface WorkbenchState {
   activeTab: VisualizationTab;

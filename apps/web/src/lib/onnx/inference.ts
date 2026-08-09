@@ -1,5 +1,5 @@
 import { getSession } from './session';
-import { imageToTensor } from './preprocess';
+import { drawModelInputCanvas, imageToTensor, MODEL_IMG_SIZE } from './preprocess';
 import classLabelsData from '../../data/classLabels.json';
 import fcWeightsData from '../../data/fcWeights.json';
 import stageMetadata from '../../data/stageMetadata.json';
@@ -213,5 +213,105 @@ export async function classifyWithLayerActivations(
   return { classification, stages };
 }
 
+export interface OcclusionResult {
+  classification: ClassificationResult;
+  /** Row-major [gridSize, gridSize] values in [0, 1] — how much occluding
+   *  that patch dropped the original predicted class's confidence,
+   *  normalized so the most damaging patch is 1. Deliberately the same
+   *  shape convention as GradCamResult so the existing heatmap renderer
+   *  (renderGradCamOverlay) works on it completely unmodified. */
+  sensitivity: Float32Array;
+  gridSize: number;
+}
+
+export const OCCLUSION_GRID_SIZE = 8;
+const OCCLUSION_FILL = 'rgb(127, 127, 127)';
+
+/** Pure math: given a baseline confidence and each patch's occluded
+ *  confidence (row-major), returns the normalized-to-[0,1] drop map.
+ *  Split out from the async orchestration below so it's unit-testable
+ *  without a real ONNX session — same pattern as computeCAM/computeEnergyMap. */
+function computeOcclusionMap(baseConfidence: number, occludedConfidences: number[]): Float32Array {
+  const drops = new Float32Array(occludedConfidences.length);
+  let max = 0;
+  for (let i = 0; i < occludedConfidences.length; i++) {
+    const drop = Math.max(baseConfidence - occludedConfidences[i], 0);
+    drops[i] = drop;
+    if (drop > max) max = drop;
+  }
+  if (max > 0) {
+    for (let i = 0; i < drops.length; i++) drops[i] /= max;
+  }
+  return drops;
+}
+
+/**
+ * Occlusion sensitivity (Zeiler & Fergus, 2014): slide an opaque gray
+ * patch across the image, one grid cell at a time, and measure how much
+ * each occlusion hurts the model's confidence in its own original answer.
+ * A patch that mattered a lot for the decision causes a big confidence
+ * drop when covered; an irrelevant patch causes almost none.
+ *
+ * Unlike Grad-CAM, this needs no access to intermediate activations or
+ * weights at all — it's entirely black-box, inference-only, and would
+ * work identically even against a model with no exported internals. The
+ * tradeoff is cost: instead of one forward pass, it's gridSize x gridSize
+ * of them (64 for the default 8x8 grid) — which is exactly why this
+ * technique, unlike Grad-CAM, genuinely needs the progress callback.
+ */
+export async function computeOcclusionSensitivity(
+  source: HTMLImageElement | HTMLCanvasElement,
+  onProgress?: (done: number, total: number) => void,
+  gridSize: number = OCCLUSION_GRID_SIZE,
+): Promise<OcclusionResult> {
+  const session = await getSession();
+  const inputName = session.inputNames[0];
+
+  // Establish the model's own view of the image once (center-cropped,
+  // resized to MODEL_IMG_SIZE) — every occlusion patch is placed in this
+  // exact pixel space, and the baseline classification comes from it too.
+  const baseCanvas = drawModelInputCanvas(source, MODEL_IMG_SIZE);
+  const baseTensor = await imageToTensor(baseCanvas);
+  const baseOutputs = await session.run({ [inputName]: baseTensor });
+  const classification = classifyFromLogits(baseOutputs[LOGITS_OUTPUT].data as Float32Array);
+  const targetIdx = classification.predictedIndex;
+
+  const patchSize = MODEL_IMG_SIZE / gridSize;
+  const total = gridSize * gridSize;
+  const occludedConfidences: number[] = new Array(total);
+
+  const occludedCanvas = document.createElement('canvas');
+  occludedCanvas.width = MODEL_IMG_SIZE;
+  occludedCanvas.height = MODEL_IMG_SIZE;
+  const ctx = occludedCanvas.getContext('2d');
+  if (!ctx) throw new Error('Could not acquire 2D canvas context');
+
+  for (let row = 0; row < gridSize; row++) {
+    for (let col = 0; col < gridSize; col++) {
+      // Redraw the pristine base image fully each time, then cover just
+      // this one cell — never cumulative across iterations.
+      ctx.drawImage(baseCanvas, 0, 0);
+      ctx.fillStyle = OCCLUSION_FILL;
+      ctx.fillRect(col * patchSize, row * patchSize, patchSize, patchSize);
+
+      const tensor = await imageToTensor(occludedCanvas);
+      const outputs = await session.run({ [inputName]: tensor });
+      const probs = softmax(outputs[LOGITS_OUTPUT].data as Float32Array);
+
+      const idx = row * gridSize + col;
+      occludedConfidences[idx] = probs[targetIdx];
+
+      onProgress?.(idx + 1, total);
+      // Yield to the event loop so the progress UI actually repaints
+      // between passes instead of the whole loop reading as one long
+      // blocking task to the browser.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
+  }
+
+  const sensitivity = computeOcclusionMap(classification.confidence, occludedConfidences);
+  return { classification, sensitivity, gridSize };
+}
+
 // Exported for unit testing the math in isolation, without a real session.
-export const __internal = { computeCAM, computeEnergyMap, softmax };
+export const __internal = { computeCAM, computeEnergyMap, computeOcclusionMap, softmax };

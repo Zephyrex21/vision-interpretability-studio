@@ -25,14 +25,14 @@ describe('WorkbenchShell', () => {
     expect(screen.getByText(/see inside the model/i)).toBeInTheDocument();
   });
 
-  it('renders all five visualization tabs', () => {
+  it('renders all six visualization tabs', () => {
     renderShell();
-    for (const label of ['Grad-CAM', 'Layers', 'Features', 'Adversarial', 'Compare']) {
+    for (const label of ['Grad-CAM', 'Layers', 'Features', 'Adversarial', 'Compare', 'Occlusion']) {
       expect(screen.getByRole('button', { name: new RegExp(label) })).toBeInTheDocument();
     }
   });
 
-  it('does not show any "soon" badges — all four tabs are live', () => {
+  it('does not show any "soon" badges — all six tabs are live', () => {
     renderShell();
     expect(screen.queryByText(/soon/i)).not.toBeInTheDocument();
   });
@@ -65,6 +65,13 @@ describe('WorkbenchShell', () => {
     expect(
       await screen.findByText(/computed fresh, right now, in your browser/i),
     ).toBeInTheDocument();
+  });
+
+  it('shows the black-box explanation on the occlusion tab', async () => {
+    const user = userEvent.setup();
+    renderShell();
+    await user.click(screen.getByRole('button', { name: /^Occlusion/ }));
+    expect(await screen.findByText(/slide a blind spot across the image/i)).toBeInTheDocument();
   });
 
   it('reopens the onboarding tour from the header help button even after it was dismissed', async () => {

@@ -5,7 +5,14 @@ import type { VisualizationTab, WorkbenchState } from './workbench-context';
 
 export type { VisualizationTab, WorkbenchState } from './workbench-context';
 
-const VALID_TABS: VisualizationTab[] = ['gradcam', 'layers', 'features', 'adversarial', 'compare'];
+const VALID_TABS: VisualizationTab[] = [
+  'gradcam',
+  'layers',
+  'features',
+  'adversarial',
+  'compare',
+  'occlusion',
+];
 
 /**
  * Shared workbench state — the single source of truth every visualization

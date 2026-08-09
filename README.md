@@ -6,15 +6,17 @@ gallery, and adversarial-robustness comparisons, all running entirely
 client-side via ONNX Runtime Web. No backend, no paid service anywhere in
 the stack.
 
-> **Status: all five blueprint phases done, plus polish.** All five tabs
-> are live: Grad-CAM (live, exact, any image), **Layers** (scrub through
-> network depth — stem → layer1 → layer2 → layer3 → layer4 — and watch a
-> real image's activation energy shift from edges to whole-object concepts,
-> computed fresh in the browser), Features (browsable filter gallery),
-> Adversarial (precomputed FGSM comparison gallery), and Compare (live
-> Grad-CAM next to precomputed Grad-CAM++). A marketing homepage now lives
-> at `/`, with the tool itself at `/app`. Deployed, mobile-tested,
-> claymorphism redesign, first-visit onboarding tour. See
+> **Status: all five blueprint phases done, plus polish, plus a 6th
+> technique.** All six tabs are live: Grad-CAM (live, exact, any image),
+> **Layers** (scrub through network depth — stem → layer1 → layer2 →
+> layer3 → layer4 — and watch a real image's activation energy shift from
+> edges to whole-object concepts, computed fresh in the browser), Features
+> (browsable filter gallery), Adversarial (precomputed FGSM comparison
+> gallery), Compare (live Grad-CAM next to precomputed Grad-CAM++), and
+> **Occlusion** (black-box confidence-drop sensitivity — no gradients, no
+> weights, no access to the model's internals at all). A marketing
+> homepage now lives at `/`, with the tool itself at `/app`. Deployed,
+> mobile-tested, claymorphism redesign, first-visit onboarding tour. See
 > [`CASE_STUDY.md`](./CASE_STUDY.md) for the full write-up — the
 > inference-only ONNX constraint, the CAM-equivalence trick that made exact
 > live Grad-CAM possible anyway, and the most interesting things the model
@@ -54,7 +56,7 @@ vision-interpretability-studio/
 │       │   │   │                    # TechStack, FinalCta, Footer, NetworkDiagram
 │       │   │   ├── workbench/       # tool layout shell, tab navigation
 │       │   │   ├── visualizations/  # GradCamView, LayersView, FeatureVizView,
-│       │   │   │                    # AdversarialView, CompareView
+│       │   │   │                    # AdversarialView, CompareView, OcclusionView
 │       │   │   └── ui/              # shared primitives (ThemeToggle, TiltCard,
 │       │   │                        # AnimatedCounter, BackgroundAtmosphere, etc.)
 │       │   ├── lib/
@@ -174,15 +176,15 @@ npm run build
 > the way `&&` does.
 
 Expected result: all steps exit `0`. The test suite covers six areas —
-**41 tests total**:
+**47 tests total**:
 
-- `WorkbenchShell.test.tsx` (8) — all five tabs render, no "soon" badges
-  remain, clicking a tab switches its content, the Layers, Adversarial, and
-  Compare tabs render their real intro copy, and the header help button
-  reopens the onboarding tour even for a returning visitor
+- `WorkbenchShell.test.tsx` (9) — all six tabs render, no "soon" badges
+  remain, clicking a tab switches its content, the Layers, Adversarial,
+  Compare, and Occlusion tabs render their real intro copy, and the header
+  help button reopens the onboarding tour even for a returning visitor
 - `OnboardingTour.test.tsx` (7) — a controlled component (open/onDismiss
   props, no internal state) that renders correctly for both `open` values,
-  lists all five tabs, and calls `onDismiss` for the button, Escape key,
+  lists all six tabs, and calls `onDismiss` for the button, Escape key,
   and a backdrop click
 - `useOnboardingTour.test.ts` (5) — the hook backing the tour: opens on a
   first visit, stays closed if already dismissed, and `openTour()`
@@ -190,12 +192,15 @@ Expected result: all steps exit `0`. The test suite covers six areas —
 - `InfoTip.test.tsx` (6) — the jargon-glossary popover: hidden initially,
   opens on click, closes on a second click, closes on outside click, closes
   on Escape, and exposes correct `aria-expanded` state
-- `lib/onnx/inference.test.ts` (11) — softmax is numerically stable and sums
-  to 1; the Grad-CAM math stays normalized to `[0, 1]`, never produces NaN,
-  and safely handles all-zero activations; the layer-scrubber's energy-map
-  math is shape-correct, magnitude-based (not sign-based, unlike Grad-CAM),
-  correctly ranks high-activity locations above near-zero ones, and never
-  divides by zero
+- `lib/onnx/inference.test.ts` (16) — softmax is numerically stable and
+  sums to 1; the Grad-CAM math stays normalized to `[0, 1]`, never
+  produces NaN, and safely handles all-zero activations; the
+  layer-scrubber's energy-map math is shape-correct, magnitude-based (not
+  sign-based, unlike Grad-CAM), correctly ranks high-activity locations
+  above near-zero ones, and never divides by zero; the occlusion
+  sensitivity math gives the most damaging patch a normalized value of
+  exactly 1, clamps to 0 rather than going negative when occluding a patch
+  _increases_ confidence, and stays finite across a realistic 8x8 grid
 - `lib/gradcam/renderOverlay.test.ts` (4) — bilinear upsampling produces the
   right output size, preserves uniform fields exactly, never overshoots the
   input range, and interpolates smoothly rather than blocking
@@ -244,7 +249,7 @@ against a local preview build) on Node 20, and the `ml/` math tests
 
 ## Performance
 
-Tab content is code-split via `React.lazy` + `Suspense` — each of the five
+Tab content is code-split via `React.lazy` + `Suspense` — each of the six
 visualization views (`GradCamView`, `LayersView`, `FeatureVizView`,
 `AdversarialView`, `CompareView`) is its own JS chunk, and the shared
 `onnxruntime-web` + inference code (~175KB) only downloads if you actually
@@ -275,7 +280,7 @@ it was never part of the JS bundle to begin with.
   confidence in the wrong class); the Compare tab runs live Grad-CAM in the
   browser right next to the precomputed Grad-CAM++ result for the same
   image, so you can see the two methods agree.
-- **Performance pass:** code-split the five visualization tabs so the ONNX
+- **Performance pass:** code-split the six visualization tabs so the ONNX
   runtime only loads for tabs that need it. Main chunk 513KB → 319KB.
 - **Deployed to Vercel** — live, tested against a real production build.
 - **Phase 3.5 — Layer Scrubber:** the one real gap from the original
@@ -301,11 +306,11 @@ it was never part of the JS bundle to begin with.
   the layer-scrubber) look physically pressed in when active rather than
   just color-swapped. Verified with computed-style assertions (active tabs
   genuinely carry an `inset` box-shadow) and pixel-sampled screenshots
-  confirming exact color-token matches across all 5 tabs and both themes —
+  confirming exact color-token matches across all 6 tabs and both themes —
   and re-ran the touch-drag regression test from the mobile pass to confirm
   the visual overhaul didn't quietly break the interaction fix underneath it.
 - **Onboarding tour + case study:** a first-visit modal introduces the tool
-  and its five tabs (dismissal persisted via `localStorage`, tested for
+  and its six tabs (dismissal persisted via `localStorage`, tested for
   both the dismiss button and Escape/backdrop-click paths). See
   [`CASE_STUDY.md`](./CASE_STUDY.md) for the full narrative write-up.
 - **Comprehension pass:** after everything above was built and working, a
@@ -325,7 +330,7 @@ it was never part of the JS bundle to begin with.
   (a module-level singleton) is cached.
 - **Inline glossary tooltips:** a shared `InfoTip` component wraps jargon
   terms (Fast Gradient Sign Method, epsilon, confidence, Grad-CAM++,
-  gradients, gradient ascent, activation) across all five tabs — tap/click
+  gradients, gradient ascent, activation) across all six tabs — tap/click
   the term for a one-line plain-English definition, dismissible via the
   same click, a click outside, or Escape. Deliberately click-based rather
   than hover-based, for the same reason the Adversarial slider had to be
@@ -420,8 +425,11 @@ that gap meant standing up a second, independent, gradient-capable engine.
 ## What's next
 
 Every phase from the original blueprint is complete, the full comprehension
-pass (Phase A/B/C), and the TensorFlow.js stretch goal for true per-upload
-FGSM _and_ Grad-CAM++. What's left is smaller, second-order polish:
+pass (Phase A/B/C), the TensorFlow.js stretch goal for true per-upload
+FGSM _and_ Grad-CAM++, and a 6th technique beyond the original blueprint —
+Occlusion Sensitivity, a black-box confidence-drop sweep that needs no
+gradients and no access to the model's internals at all. What's left is
+smaller, second-order polish:
 
 1. An epsilon slider for the live FGSM playground (currently fixed at 0.03,
    matching the precomputed gallery) — would let a visitor feel out the

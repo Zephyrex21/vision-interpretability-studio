@@ -19,9 +19,9 @@ const STATS = [
   },
   {
     icon: Boxes,
-    value: 5,
+    value: 6,
     suffix: ' techniques',
-    title: 'Grad-CAM, layers, features, adversarial, compare',
+    title: 'Grad-CAM, layers, features, adversarial, compare, occlusion',
   },
   {
     icon: Cpu,
@@ -81,7 +81,7 @@ export function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.55 }}
           >
-            A ResNet-18 trained from scratch, inspected live — five interactive ways to see exactly
+            A ResNet-18 trained from scratch, inspected live — six interactive ways to see exactly
             what it looked at and why it answered the way it did. No server, no upload, no waiting
             on a queue: the model runs in your tab.
           </motion.p>

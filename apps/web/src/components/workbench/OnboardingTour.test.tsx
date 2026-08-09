@@ -21,10 +21,10 @@ describe('OnboardingTour', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('lists all five tabs with a short description each', async () => {
+  it('lists all six tabs with a short description each', async () => {
     renderTour(true);
     await screen.findByRole('dialog');
-    for (const label of ['Grad-CAM', 'Layers', 'Features', 'Adversarial', 'Compare']) {
+    for (const label of ['Grad-CAM', 'Layers', 'Features', 'Adversarial', 'Compare', 'Occlusion']) {
       expect(screen.getByText(label)).toBeInTheDocument();
     }
   });

@@ -6,6 +6,7 @@ import {
   GitCompare,
   LayoutGrid,
   Layers as LayersIcon,
+  ScanSearch,
   ShieldAlert,
 } from 'lucide-react';
 import { TiltCard } from '../ui/TiltCard';
@@ -47,6 +48,13 @@ const FEATURES = [
     description:
       'Live Grad-CAM against a precomputed Grad-CAM++ computed with true gradients through the whole network.',
   },
+  {
+    tab: 'occlusion',
+    icon: ScanSearch,
+    title: 'Occlusion',
+    description:
+      "Slide a gray patch across the image and measure the confidence drop — no gradients, no weights, no access to the model's internals at all.",
+  },
 ] as const;
 
 export function FeatureGrid() {
@@ -63,7 +71,7 @@ export function FeatureGrid() {
           className={styles.eyebrow}
           variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
         >
-          Five ways to see inside
+          Six ways to see inside
         </motion.p>
         <motion.h2
           className={styles.title}

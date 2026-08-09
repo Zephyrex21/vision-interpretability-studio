@@ -50,22 +50,38 @@ mean-activation "energy map" — a genuinely different question from Grad-CAM
 ("where is this layer active" vs. "why this class"), but the same
 forward-only philosophy.
 
-## Where the trick runs out: honest scope, not silent failure
+## Where the trick runs out: two different ways around it
 
 Grad-CAM++ and FGSM adversarial perturbation **do** need real gradients —
 Grad-CAM++'s higher-order weighting terms don't reduce to a closed form,
 and FGSM needs the gradient of loss with respect to every input pixel,
 which requires backpropagating through the entire network, not just the
-final layer.
+final layer. Two different responses to that, both shipped rather than
+glossed over:
 
-Rather than fake these or silently drop them, they're precomputed once on
-Kaggle (where real PyTorch autograd is available) for ten sample images,
-shipped as static comparison data. The Adversarial and Compare tabs are
-upfront about which parts are live-for-any-image versus precomputed-for-
-these-samples. A true per-upload version of either would need a
-backprop-capable in-browser runtime (e.g. re-hosting the weights in
-TensorFlow.js) — a real engineering lift, tracked as a stretch goal rather
-than glossed over.
+**Precompute it.** For the Adversarial and Compare tabs' main galleries,
+these are computed once on Kaggle (where real PyTorch autograd is
+available) for ten sample images, shipped as static comparison data. The
+tabs are upfront about which parts are live-for-any-image versus
+precomputed-for-these-samples.
+
+**Get real gradients in the browser anyway.** Both tabs also have a live
+playground that accepts any upload — this needed a second, independent
+inference engine, so the trained ResNet-18 was hand-ported from ONNX into
+TensorFlow.js (manual weight-layout transpose included), then verified
+numerically against the original to 6 decimal places of max logit
+difference. That's the one piece of this project that isn't an exact,
+zero-approximation trick — it's a from-scratch reimplementation, checked
+empirically rather than derived on paper.
+
+**Or don't need gradients at all.** The Occlusion tab takes a third path:
+slide a gray patch across the image and measure how much covering each
+region hurts the model's own confidence in its own answer. No gradients,
+no architecture-specific trick, no access to weights or activations —
+just repeated black-box inference. It would work identically on a model
+with no exported internals whatsoever. The cost is real: 64 forward
+passes instead of one, since there's no shortcut available without
+peeking inside.
 
 ## The most interesting finding
 

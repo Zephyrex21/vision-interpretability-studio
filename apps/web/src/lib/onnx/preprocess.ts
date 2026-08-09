@@ -3,6 +3,34 @@ import { ort } from './session';
 export const MODEL_IMG_SIZE = 160;
 
 /**
+ * Draws an image source onto an offscreen canvas, center-cropped to a
+ * square and resized to `size` — matching the notebook's eval transform
+ * (resize-then-center-crop). Exposed separately from `imageToTensor` so
+ * occlusion sensitivity can occlude patches in the model's own input pixel
+ * space before re-tensorizing each occluded variant.
+ */
+export function drawModelInputCanvas(
+  source: HTMLImageElement | HTMLCanvasElement,
+  size: number = MODEL_IMG_SIZE,
+): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Could not acquire 2D canvas context for preprocessing');
+
+  const srcWidth = 'naturalWidth' in source ? source.naturalWidth : source.width;
+  const srcHeight = 'naturalHeight' in source ? source.naturalHeight : source.height;
+
+  const cropSize = Math.min(srcWidth, srcHeight);
+  const cropX = (srcWidth - cropSize) / 2;
+  const cropY = (srcHeight - cropSize) / 2;
+
+  ctx.drawImage(source, cropX, cropY, cropSize, cropSize, 0, 0, size, size);
+  return canvas;
+}
+
+/**
  * Draws an image source onto an offscreen canvas at the model's expected
  * size (center-cropped to square, matching the notebook's eval transform:
  * resize-then-center-crop), then reads back raw RGBA pixels and converts
@@ -16,21 +44,8 @@ export async function imageToTensor(
   source: HTMLImageElement | HTMLCanvasElement,
   size: number = MODEL_IMG_SIZE,
 ): Promise<ort.Tensor> {
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('Could not acquire 2D canvas context for preprocessing');
-
-  const srcWidth = 'naturalWidth' in source ? source.naturalWidth : source.width;
-  const srcHeight = 'naturalHeight' in source ? source.naturalHeight : source.height;
-
-  // Center-crop to a square in source space, then draw scaled to `size`.
-  const cropSize = Math.min(srcWidth, srcHeight);
-  const cropX = (srcWidth - cropSize) / 2;
-  const cropY = (srcHeight - cropSize) / 2;
-
-  ctx.drawImage(source, cropX, cropY, cropSize, cropSize, 0, 0, size, size);
+  const canvas = drawModelInputCanvas(source, size);
+  const ctx = canvas.getContext('2d')!;
 
   const { data } = ctx.getImageData(0, 0, size, size); // RGBA, uint8, HWC
   const chw = new Float32Array(3 * size * size);
