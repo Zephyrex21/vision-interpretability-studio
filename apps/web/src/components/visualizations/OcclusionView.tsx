@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CloudDownload, ScanSearch, Upload } from 'lucide-react';
-import { computeOcclusionSensitivity } from '../../lib/onnx/inference';
+import { computeOcclusionSensitivity, CLASS_LABELS } from '../../lib/onnx/inference';
 import type { ClassificationResult } from '../../lib/onnx/inference';
 import { drawModelInputCanvas, loadImageElement } from '../../lib/onnx/preprocess';
 import { isSessionReady } from '../../lib/onnx/session';
@@ -9,6 +9,7 @@ import { renderGradCamOverlay } from '../../lib/gradcam/renderOverlay';
 import { SAMPLE_IMAGES } from '../../data/sampleImages';
 import { HeatmapLegend } from '../ui/HeatmapLegend';
 import { InfoTip } from '../ui/InfoTip';
+import { ProbabilityChart } from '../ui/ProbabilityChart';
 import { SectionHeader } from '../ui/SectionHeader';
 import { SampleStrip } from '../ui/SampleStrip';
 import styles from './OcclusionView.module.css';
@@ -162,6 +163,11 @@ export function OcclusionView() {
                 computed the same way Grad-CAM is checked, from real measured confidence drops, not
                 an approximation.
               </p>
+              <p className={styles.chartLabel}>Top 5 of 10 classes</p>
+              <ProbabilityChart
+                probabilities={classification.probabilities}
+                labels={CLASS_LABELS}
+              />
               <HeatmapLegend
                 label="removing this hurt confidence: little → a lot"
                 className={styles.legendSpacing}

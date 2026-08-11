@@ -42,8 +42,6 @@ export function LiveGradCamPlusPlusPlayground() {
       const url = URL.createObjectURL(file);
       const img = await onnxPreprocess.loadImageElement(url);
 
-      setStatus('running');
-
       // Live Grad-CAM (exact, forward-only, ONNX) — fast, and likely
       // already cached if the visitor has used the Grad-CAM tab.
       const gradcamResult = await onnxInference.classifyWithGradCam(img);

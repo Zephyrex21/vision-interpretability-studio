@@ -9,6 +9,7 @@ import { renderGradCamOverlay } from '../../lib/gradcam/renderOverlay';
 import { SAMPLE_IMAGES, sampleImageUrl } from '../../data/sampleImages';
 import { HeatmapLegend } from '../ui/HeatmapLegend';
 import { InfoTip } from '../ui/InfoTip';
+import { ProbabilityChart } from '../ui/ProbabilityChart';
 import { SectionHeader } from '../ui/SectionHeader';
 import { SampleStrip } from '../ui/SampleStrip';
 import styles from './GradCamView.module.css';
@@ -155,6 +156,11 @@ export function GradCamView() {
                 Heatmap shows the exact region driving this classification — computed as a real
                 forward pass through the trained weights, not an approximation.
               </p>
+              <p className={styles.chartLabel}>Top 5 of 10 classes</p>
+              <ProbabilityChart
+                probabilities={classification.probabilities}
+                labels={CLASS_LABELS}
+              />
               <HeatmapLegend
                 label="low attention → high attention"
                 className={styles.legendSpacing}

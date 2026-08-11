@@ -135,6 +135,15 @@
   margin-top: var(--space-4);
 }
 
+.chartLabel {
+  margin: var(--space-4) 0 var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .errorCard {
   padding: var(--space-4);
   border-radius: var(--radius-md);
